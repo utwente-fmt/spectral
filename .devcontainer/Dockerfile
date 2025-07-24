@@ -59,8 +59,9 @@ RUN rm -rf "$GNUPGHOME" swift6.tar.gz.sig swift6.tar.gz
 # TODO: Install rustup manually and check the certificates
 # Setup Rust 
 WORKDIR /
-ENV CARGO_HOME=/.cargo
-ENV RUSTUP_HOME=/.rustup
+ENV CARGO_HOME=/home/vscode/.cargo
+ENV RUSTUP_HOME=/home/vscode/.rustup
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain 1.77.0 -v -y
+RUN sudo chown -R vscode /home/vscode/.cargo/
 
-ENV PATH=/.cargo/bin:${PATH}
+ENV PATH=/home/vscode/.cargo/bin:${PATH}
