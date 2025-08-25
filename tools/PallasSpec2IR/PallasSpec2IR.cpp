@@ -2,6 +2,7 @@
 #include "CSpecUnifier.h"
 #include "CCompilerDriver.h"
 #include "CppSpecTransformer.h"
+#include "RustSpecTransformer.h"
 #include "SwiftSpecTransformer.h"
 #include "utils/OutputConfig.h"
 #include "utils/PallasException.h"
@@ -23,12 +24,13 @@ enum ClSourceLang
 {
     C,
     Cpp,
+    Rust,
     Swift,
     Infer
 };
 
 std::map<ClSourceLang, std::string> langNames = {
-    {C, "C"}, {Cpp, "C++"}, {Swift, "Swift"}, {Infer, "Auto"}};
+    {C, "C"}, {Cpp, "C++"}, {Swift, "Swift"}, {Rust, "Rust"}, {Infer, "Auto"}};
 
 static llvm::cl::OptionCategory SpecTransformCat(
     "Specification transformation");
@@ -67,6 +69,7 @@ static llvm::cl::opt<ClSourceLang> clLang(
     llvm::cl::values(
         clEnumVal(C, "C"),
         clEnumVal(Cpp, "C++"),
+        clEnumVal(Rust, "Rust"),
         clEnumVal(Swift, "Swift"),
         clEnumVal(Infer, "Infer source-language from file-extension")),
     llvm::cl::cat(SpecTransformCat));
@@ -77,7 +80,6 @@ static llvm::cl::opt<std::string> clWorkDir(
     llvm::cl::desc("The working directory. If the option is not set, the current directory is used."),
     llvm::cl::value_desc("Path to the working-directory."),
     llvm::cl::cat(SpecTransformCat));
-
 
 static llvm::cl::opt<bool> clMem2Reg(
     "mem2reg", llvm::cl::desc("Apply mem2reg pass to the compiled source."), llvm::cl::init(false),
@@ -109,6 +111,8 @@ int main(int argc, char **argv)
             lang = C;
         else if (inFileExt == ".cpp")
             lang = Cpp;
+        else if (inFileExt == ".rs")
+            lang = Rust;
         else if (inFileExt == ".swift")
             lang = Swift;
         else
@@ -144,12 +148,18 @@ int main(int argc, char **argv)
                 clLibPath, clInFile, clOutFile, config, clWorkDir, clMem2Reg);
             transformer.transformModule();
         }
+        else if (lang == Rust)
+        {
+            sourcespec2ir::RustSpecTransformer transformer(
+                clLibPath, clInFile, clOutFile, config, clWorkDir, clMem2Reg);
+            transformer.transformModule();
+        }
         else if (lang == Swift)
         {
             sourcespec2ir::SwiftSpecTransformer transformer(
                 clLibPath, clInFile, clOutFile, config, clWorkDir, clMem2Reg);
             transformer.transformModule();
-        } 
+        }
     }
     catch (const sourcespec2ir::utils::PallasException &e)
     {
@@ -167,7 +177,8 @@ int main(int argc, char **argv)
     auto endTime = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsedTime = (endTime - startTime);
 
-    if (clPrintTime) {
+    if (clPrintTime)
+    {
         std::stringstream sStream;
         sStream.setf(std::ios::fixed);
         sStream.precision(3);

@@ -1,5 +1,6 @@
 add_subdirectory(C)
 add_subdirectory(core)
 add_subdirectory(Cpp)
+add_subdirectory(rust)
 add_subdirectory(swift)
 add_subdirectory(utils)
