@@ -1,5 +1,8 @@
 #include "RustWrapperGenerator.h"
 #include "PallasException.h"
+#include "SrcLookup.h"
+
+#include <sstream>
 
 namespace sourcespec2ir
 {
@@ -15,15 +18,33 @@ namespace sourcespec2ir
         const std::string &functionName, 
         const llvm::DIType *returnType)
     {
-        // TODO: Implement soimilar to C++
-        return "UNIMPLEMENTED";
+        std::stringstream stream;
+        stream << "fn " << functionName << "(";
+
+        // Arg-list (vars passed as immutable references)
+        for (auto it = srcVars.begin(), end = srcVars.end(); it != end; ++it)
+        {
+            if (it != srcVars.begin())
+                stream << ", ";
+            const auto varName = utils::getSrcVarName(**it);
+            const auto varType = getSrcReprOfType((*it)->getType());
+            stream << varName << ": " << "&" << varType;
+        }
+        stream << ") -> bool ";
+
+        // Body
+        stream << "{" << "\n";
+        stream << expr << ";" << "\n";
+        stream << "}" << "\n";
+
+        return stream.str();
     }
 
     std::pair<size_t, size_t> RustWrapperGenerator::getOffsetToExprStart(
         const SrcWrapperFunction &wFun)
     {
         // TODO: Implement for Rust
-        return std::make_pair(0, 0);
+        return std::make_pair(1, 0);
     }
 
 }
