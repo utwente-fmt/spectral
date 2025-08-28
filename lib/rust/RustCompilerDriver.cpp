@@ -40,6 +40,7 @@ namespace sourcespec2ir
         call << " --emit=llvm-ir ";
         call << " -g ";
         call << " -C opt-level=0";
+        call << " --crate-type lib ";
         // TODO: Check if MIR optimizations also have to be disabled
         call << " -o " << irOutStr;
         call << " -L " << specLibPath << "/ ";
