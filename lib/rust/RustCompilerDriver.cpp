@@ -22,9 +22,6 @@ namespace sourcespec2ir
     std::unique_ptr<llvm::Module> RustCompilerDriver::compileSource(
         const std::string &srcFilePath, llvm::LLVMContext &context)
     {
-        // TODO: Implement similar to C++
-        return nullptr;
-
         // Generate file for IR in work-dir
         std::string irFileName = "tmp_ir_source" +
                                  std::to_string(callCounter++) + ".ll";
