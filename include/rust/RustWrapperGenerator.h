@@ -20,6 +20,8 @@ namespace sourcespec2ir
         std::pair<size_t, size_t> getOffsetToExprStart(
             const SrcWrapperFunction &wFun) override;
 
+        std::string getNameForWrapperFunction() override;
+
     protected:
         // Overwritten methods to customize the default-WrapperGenerator
         // TODO: Check which of these are needed.
@@ -33,6 +35,9 @@ namespace sourcespec2ir
                                  const std::string &childNamespace) override;
         void modifySrcWithWrappers(std::vector<SrcLine> &srcLines) override;
         */
+
+    private: 
+        int wrapperCnt = 0;
     };
 
 }

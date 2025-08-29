@@ -1,5 +1,7 @@
 #include "RustWrapperGenerator.h"
+
 #include "PallasException.h"
+#include "RustNameConstants.h"
 #include "SrcLookup.h"
 
 #include <sstream>
@@ -19,7 +21,9 @@ namespace sourcespec2ir
         const llvm::DIType *returnType)
     {
         std::stringstream stream;
-        stream << "fn " << functionName << "(";
+        // TODO: Find another way to disable compiler from removing unsed
+        //  functions. pub will not always work.
+        stream << "pub fn " << functionName << "(";
 
         // Arg-list (vars passed as immutable references)
         for (auto it = srcVars.begin(), end = srcVars.end(); it != end; ++it)
@@ -34,7 +38,7 @@ namespace sourcespec2ir
 
         // Body
         stream << "{" << "\n";
-        stream << expr << ";" << "\n";
+        stream << expr << "\n";
         stream << "}" << "\n";
 
         return stream.str();
@@ -45,6 +49,11 @@ namespace sourcespec2ir
     {
         // TODO: Implement for Rust
         return std::make_pair(1, 0);
+    }
+
+    std::string RustWrapperGenerator::getNameForWrapperFunction()
+    {
+        return RUST_WRAPPER_PREFIX + std::to_string(wrapperCnt++);
     }
 
 }

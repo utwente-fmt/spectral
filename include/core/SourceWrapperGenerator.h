@@ -108,7 +108,7 @@ namespace sourcespec2ir
          * The default-implementation simply increments a counter and appends it
          * to 'PALLAS_SPEC_'.
          */
-        std::string getNameForWrapperFunction();
+        virtual std::string getNameForWrapperFunction();
 
         /**
          * Combines the generated wrapper functions and the source-representation
