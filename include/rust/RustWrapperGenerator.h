@@ -33,8 +33,8 @@ namespace sourcespec2ir
                                const std::string &typedefName) override;
         std::string addNamespace(const std::string &parentNamespace,
                                  const std::string &childNamespace) override;
-        void modifySrcWithWrappers(std::vector<SrcLine> &srcLines) override;
         */
+       void modifySrcWithWrappers(std::vector<SrcLine> &srcLines) override;
 
     private: 
         int wrapperCnt = 0;
