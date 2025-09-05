@@ -4,16 +4,16 @@
  */
 
 #[inline(never)]
-pub fn _imply(_a: &bool, _b: &bool) { unimplemented!(); }
+pub fn _imply(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _and(_a: &bool, _b: &bool) { unimplemented!(); }
+pub fn _and(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _or(_a: &bool, _b: &bool) { unimplemented!(); }
+pub fn _or(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _sep(_a: &bool, _b: &bool) { unimplemented!(); }
+pub fn _sep(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
 
 /*
  *  Specification constructs
@@ -28,14 +28,14 @@ pub fn _result<T>() -> T { unimplemented!(); }
  *  Quantifiers
  */
 #[inline(never)]
-pub fn _forall(_range: &bool, _expr: &bool) { unimplemented!(); }
+pub fn _forall(_range: &bool, _expr: &bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
 #[allow(non_snake_case)]
-pub fn _forallS(_range: &bool, _expr: &bool) { unimplemented!(); }
+pub fn _forallS(_range: &bool, _expr: &bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _exists(_range: &bool, _expr: &bool) { unimplemented!(); }
+pub fn _exists(_range: &bool, _expr: &bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
 pub fn _bv<T>(_id: &str) -> T { unimplemented!(); }

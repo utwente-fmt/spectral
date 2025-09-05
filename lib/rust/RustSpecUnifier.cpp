@@ -1,6 +1,10 @@
 #include "RustSpecUnifier.h"
 #include "PallasException.h"
 
+#include <llvm/ADT/StringRef.h>
+#include <llvm/Demangle/Demangle.h>
+#include <llvm/Support/raw_ostream.h>
+
 namespace sourcespec2ir
 {
 
@@ -12,9 +16,29 @@ namespace sourcespec2ir
     std::optional<SpecUnifier::SpecLibElement>
     RustSpecUnifier::isSrcSpecificationFunction(const llvm::Function &f)
     {
-        // TODO: Implement similar to C++
+        // Implement: Make less bad, check scope
+        auto fName = f.getName().str();
+        auto nameDemangle = llvm::demangle(fName);
+        // llvm::outs() << "Demangle " << fName << " --> " << nameDemangle << "\n";
+
+        // Check if the name starts with the spec-namespace:
+        auto nameCrop = llvm::StringRef(nameDemangle);
+        if (!nameCrop.consume_front(RUST_SPEC_NAMESPACE + "::"))
+            return std::nullopt;
+
+        // Check exact matches
+        auto exactMatch = EXACT_MATCH_NAME_MAP.find(nameCrop);
+        if (exactMatch != EXACT_MATCH_NAME_MAP.end())
+            return std::make_optional<SpecLibElement>(exactMatch->getValue());
+
+        // Check prefix-matches
+        for (auto key : PREFIX_MATCH_NAME_MAP.keys())
+            if (llvm::StringRef(nameCrop).startswith(key))
+                return std::make_optional(PREFIX_MATCH_NAME_MAP.at(key));
+
         return std::nullopt;
     }
+
 
     llvm::Type *RustSpecUnifier::getContentTypeOfADTTy(const llvm::Type &t)
     {

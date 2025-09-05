@@ -20,35 +20,37 @@ namespace sourcespec2ir
     {
     public:
 
-        /*
-        const std::string CPP_SPEC_NAMESPACE = "pallasSpec";
+
+        const std::string RUST_SPEC_NAMESPACE = "rust_spec";
         // Map names of functions of the specification-library to the 
         // corresponding enum-representation.
         const llvm::StringMap<SpecLibElement> EXACT_MATCH_NAME_MAP = {
-            {"_imply(bool, bool)", Imply},
-            {"_and(bool, bool)", ScAnd},
-            {"_or(bool, bool)", ScOr},
-            {"_exists(bool, bool)", Exists},
-            {"_forall(bool, bool)", Forall},
-            {"_forallS(bool, bool)", ForallSep},
-            {"_fracOf(int, int)", FracOf}, 
-            {"_sep(bool, bool)", SepConj}
-        };
-        const llvm::StringMap<SpecLibElement> PREFIX_MATCH_NAME_MAP = {
-            {"_old<", Old},
-            {"_result<", Result},
-            {"_bv<", BoundVar},
-            {"_seqNew<", SeqNew},
-            {"_seqSize<", SeqSize},
-            {"_seqGet<", SeqGet},
-            {"_seqPrepend<", SeqPrepend},
-            {"_seqEquals<", SeqEquals}, 
-            {"_Perm<", Perm}, 
-            {"_ptrBlockLength<", PtrBlockLength},
-            {"_ptrBlockOffset<", PtrBlockOffset},
-            {"_ptrLength<", PtrLength}
+            //{"_imply(bool, bool)", Imply},
+            //{"_and(bool, bool)", ScAnd},
+            //{"_or(bool, bool)", ScOr},
+            //{"_exists(bool, bool)", Exists},
+            //{"_forall(bool, bool)", Forall},
+            //{"_forallS(bool, bool)", ForallSep},
+            //{"_fracOf(int, int)", FracOf}, 
+            //{"_sep(bool, bool)", SepConj}
         };
 
+        const llvm::StringMap<SpecLibElement> PREFIX_MATCH_NAME_MAP = {
+            //{"_old<", Old},
+            {"_result", Result},
+            //{"_bv<", BoundVar},
+            //{"_seqNew<", SeqNew},
+            //{"_seqSize<", SeqSize},
+            //{"_seqGet<", SeqGet},
+            //{"_seqPrepend<", SeqPrepend},
+            //{"_seqEquals<", SeqEquals}, 
+            //{"_Perm<", Perm}, 
+            //{"_ptrBlockLength<", PtrBlockLength},
+            //{"_ptrBlockOffset<", PtrBlockOffset},
+            //{"_ptrLength<", PtrLength}
+        };
+
+        /*
         const std::string CPP_SPEC_FRAC_TYPE = "struct.pallasSpec::frac";
         const std::string CPP_SPEC_SEQ_TYPE_BASE = "struct.pallasSpec::seq";
         */
