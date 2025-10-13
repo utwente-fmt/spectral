@@ -11,6 +11,6 @@ examples/cpp_test.h
 examples/c_test.c
 .vscode/settings.json
 examples/swift_test.swift
-res/spec_libs/rust/rust-spec/Cargo.toml
-res/spec_libs/rust/rust-spec/Cargo.lock
-res/spec_libs/rust/rust-spec/target/
+res/spec_libs/rust/rust_spec/Cargo.toml
+res/spec_libs/rust/rust_spec/Cargo.lock
+res/spec_libs/rust/rust_spec/target/
