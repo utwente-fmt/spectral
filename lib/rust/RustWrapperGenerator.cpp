@@ -23,6 +23,7 @@ namespace sourcespec2ir
         std::stringstream stream;
         // TODO: Find another way to disable compiler from removing unsed
         //  functions. pub will not always work.
+        stream << "#[allow(unused_variables)]\n";
         stream << "pub fn " << functionName << "(";
 
         // Arg-list (vars passed as immutable references)
@@ -48,7 +49,7 @@ namespace sourcespec2ir
         const SrcWrapperFunction &wFun)
     {
         // TODO: Implement for Rust
-        return std::make_pair(1, 0);
+        return std::make_pair(2, 0);
     }
 
     std::string RustWrapperGenerator::getNameForWrapperFunction()
@@ -69,6 +70,7 @@ namespace sourcespec2ir
 
         // Add include for the specification-library to the top of the
         // generated file.
+        // This has to be placed under the #![no_main] macro if present
         // srcLines.insert(srcLines.begin(),
         //                SrcLine("#include \"cpp_spec_lib.h\"", 0));
         // TODO: Add a use::rust_spec to the top of the file.

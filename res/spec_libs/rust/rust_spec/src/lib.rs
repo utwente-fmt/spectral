@@ -4,16 +4,17 @@
  */
 
 #[inline(never)]
-pub fn _imply(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
+// #[export_name = "_pallas_spec_imply"]
+pub fn _imply(_a: bool, _b: bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _and(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
+pub fn _and(_a: bool, _b: bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _or(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
+pub fn _or(_a: bool, _b: bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _sep(_a: &bool, _b: &bool) -> bool { unimplemented!(); }
+pub fn _sep(_a: bool, _b: bool) -> bool { unimplemented!(); }
 
 /*
  *  Specification constructs

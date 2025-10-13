@@ -38,6 +38,10 @@ namespace sourcespec2ir
         const llvm::StringMap<SpecLibElement> PREFIX_MATCH_NAME_MAP = {
             //{"_old<", Old},
             {"_result", Result},
+            {"_imply", Imply}, // Check if this can be done with an exact match
+            {"_and", ScAnd},
+            {"_or", ScOr}, 
+            {"_sep", SepConj},
             //{"_bv<", BoundVar},
             //{"_seqNew<", SeqNew},
             //{"_seqSize<", SeqSize},
