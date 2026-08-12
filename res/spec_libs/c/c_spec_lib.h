@@ -11,14 +11,13 @@
  * However, when the types are defined as empty structs, clang optimizes them 
  * away when they are passed as a parameter to a function. Hence the structs 
  * contain dummmy-values to avoid this. 
- * Moreover the structs are filled with dummy-values to exceed a length 
- * of 64 bytes to ensure that they are passed as a by-value pointer to functions 
- * (ABI-dependent behavior).
+ * Moreover the structs is filled with a "randomly"-sized array to prevent it
+ * from being merged with a user's type.
  */
 
 typedef struct
 {
-    int32_t dummy1, dummy2, dummy3, dummy4, dummy5;
+    int32_t dummy[0x66726163];
 } frac;
 
 /* Macros for 'generic' ADTs */
@@ -33,7 +32,7 @@ typedef struct
 // size to suppress ABI-specific optimizations when passing the struct.
 #define DEF_SEQ_T(type) typedef struct { \
     type contentType; \
-    int32_t dummy1, dummy2, dummy3, dummy4, dummy5; \
+    int32_t dummy[0x736571]; \
 } SEQ(type)
 
 
@@ -42,8 +41,12 @@ typedef struct
  *******************************************/
 
 // Macros to define a version of \result for every possible return-type
-#define RESULT_NAME(type) PALLAS_RESULT___ ## type
-#define DEF_RESULT(type) type RESULT_NAME(type) ()
+// In special case where the type contains characters that may not appear in a 
+// function name (e.g. *) the DEF_RESULT_ macro can be used with a custom alias. 
+// In the normal case, the alias is equal to the type-name.
+#define RESULT_NAME(alias) PALLAS_RESULT___ ## alias
+#define DEF_RESULT_(type, alias) type RESULT_NAME(alias) ()
+#define DEF_RESULT(type) DEF_RESULT_(type, type)
 #define _result(type) RESULT_NAME(type)()
 
 // Macros to define a version of \old(...) for every possible parameter-type
@@ -103,13 +106,17 @@ bool _sep(bool lhs, bool rhs);
 frac _fracOf(int numerator, int denominator);
 
 /*******************************************
- *          Shorthand-notations            *
+ *              Predicates                 *
  *******************************************/
 
-// Macro for write-permission
-#define _write _fracOf(1, 1)
-
-#define _inRange(lower, v, upper) _and(lower <= v , v < upper)
+// Macros to define a version of \unfolding for expressions with different types.
+// In special case where the type contains characters that may not appear in a 
+// function name (e.g. *) the DEF_UNFOLDING_ macro can be used with a custom alias. 
+// In the normal case, the alias is equal to the type-name.
+#define UNFOLDING_NAME(alias) PALLAS_UNFOLDING___ ## alias
+#define DEF_UNFOLDING_(type, alias) type UNFOLDING_NAME(alias) (bool pred, type in)
+#define DEF_UNFOLDING(type) DEF_UNFOLDING_(type, type)
+#define _unfolding(type) UNFOLDING_NAME(type)
 
 /*******************************************
  *          Sequence-operations            *
@@ -136,6 +143,14 @@ frac _fracOf(int numerator, int denominator);
 #define _seqEq(type) PALLAS_SEQ_EQ___ ## type
 #define DEF_SEQ_EQ(type) bool _seqEq(type) (SEQ(type) s1, SEQ(type) s2)
 
+// Sequence-slice
+#define _seqSlice(type) PALLAS_SEQ_SLICE___ ## type
+#define DEF_SEQ_SLICE(type) SEQ(type) _seqSlice(type) (SEQ(type) s, size_t start, size_t end)
+
+// Sequence-update / Set element at index
+#define _seqSet(type) PALLAS_SEQ_SET___ ## type
+#define DEF_SEQ_SET(type) SEQ(type) _seqSet(type) (SEQ(type) s, size_t idx, type value)
+
 
 /*********************************************
  *     Convenience macros for ADTs           *
@@ -151,5 +166,21 @@ DEF_SEQ_SIZE(type) ; \
 DEF_SEQ_AT(type) ; \
 DEF_SEQ_PREPEND(type); \
 DEF_SEQ_NEW(type); \
-DEF_SEQ_EQ(type);
+DEF_SEQ_EQ(type); \
+DEF_SEQ_SLICE(type); \
+DEF_SEQ_SET(type);
 
+/*******************************************
+ *          Shorthand-notations            *
+ *******************************************/
+
+// Macro for write-permission
+#define _write _fracOf(1, 1)
+
+#define _inRange(lower, v, upper) _and(lower <= v , v < upper)
+
+// _seqHead(int, s) 
+#define _seqHead(type, s) _seqAt(type)(s, 0)
+
+// _seqTail(int, s)
+#define _seqTail(type, s) _seqSlice(type)(s, 1, _seqSize(int)(s))

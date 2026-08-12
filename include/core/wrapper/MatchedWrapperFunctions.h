@@ -26,13 +26,23 @@ namespace sourcespec2ir
             loopInvWrappers;
         std::map<const MatchedSpecStatement *, std::unique_ptr<SrcWrapperFunction>>
             statementWrappers;
-
+        std::map<const MatchedFContractStatement *, std::unique_ptr<SrcWrapperFunction>>
+            ghostContractWrappers;
+        std::map<const MatchedGhostVarBinding *, std::unique_ptr<SrcWrapperFunction>>
+            givenBindingWrappers;
+            
         MatchedWrapperFunctions();
 
         /**
          * Returns a vector that contains pointers to all wrapper-functions.
          */
         std::unique_ptr<llvm::SmallVector<SrcWrapperFunction *>> getWrappers();
+
+        /**
+         * Returns a vector with pointers to all wrapper-functions that belong
+         * to an external contract.
+         */
+        llvm::SmallVector<SrcWrapperFunction *> getExternalWrappers();
     };
 }
 

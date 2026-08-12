@@ -3,15 +3,21 @@
 
 #include "MatchedSourceSpec.h"
 #include "wrapper/SrcLocation.h"
+#include "wrapper/SrcTypeRepresentation.h"
 #include "wrapper/SrcWrapperFunction.h"
 #include "wrapper/MatchedWrapperFunctions.h"
+#include "wrapper/WrapperLocMarker.h"
+#include "wrapper/WrapperSignature.h"
 #include "SpecDeclaration.h"
+#include "SpecPredicate.h"
+#include "SourceSyntaxResolver.h"
 
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/ADT/SetVector.h>
 #include <llvm/IR/DebugInfoMetadata.h>
 #include <llvm/IR/Instruction.h>
 
+#include <list>
 #include <map>
 #include <memory>
 #include <string>
@@ -29,11 +35,14 @@ namespace sourcespec2ir
     public:
         /**
          * Generates a new wrapper-generator.
-         * The provided reference to the specDeclarations must remain valid for
-         * the lifetime of the SourceWrapperGenerator.
+         * The provided references to the specDeclarations and InsertLocations
+         * must remain valid for the lifetime of the WrapperGenerator.
          */
         SourceWrapperGenerator(
-            const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations);
+            const std::string srcInFile,
+            const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations,
+            const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers, 
+            std::unique_ptr<SourceSyntaxResolver> syntaxResolver);
 
         virtual ~SourceWrapperGenerator() = default;
 
@@ -57,10 +66,31 @@ namespace sourcespec2ir
          * specifices the return-type of this function.
          */
         virtual std::string getWrapperFunctionString(
-            const llvm::ArrayRef<llvm::DILocalVariable *> &srcVars,
+            const WrapperSignature &sig,
             const std::string &expr,
-            const std::string &functionName,
-            const llvm::DIType *returnType = nullptr) = 0;
+            const std::string &functionName) = 0;
+
+        /**
+         * Generates a string representation for a given predicate definition.
+         * The function must return a boolean.
+         * Argument 'sig' contains the signature and name of the function.
+         * Argument 'body' contains the expression that makes up the predicate.
+         *
+         * E.g. for C a call with the following inputs
+         * sig:  'hasVal(int *ptr, int val)'
+         * body: '_sep(_Perm(ptr, _write),
+         *             *ptr == val)'
+         * could be represented with the following function:
+         * '
+         * bool hasVal(int *ptr, int val) {
+         *      return _sep(_Perm(ptr, _write),
+         *             *ptr == val);
+         * }
+         * '
+         */
+        virtual std::string getPredicateDefString(const std::string &name,
+                                                  const std::string &args,
+                                                  const std::string &body) = 0;
 
         /**
          * For a given SrcWrapperFunction, return the line- and column-offset
@@ -81,12 +111,28 @@ namespace sourcespec2ir
             const SrcWrapperFunction &wFun) = 0;
 
         /**
+         * Analogous to getOffsetToExprStart for wrapper fucntions, but for
+         * predicate definitions.
+         */
+        virtual std::pair<size_t, size_t> getOffsetToExprStart(
+            const SpecPredicate &pDef) = 0;
+
+        /**
          * Return the line-number where the wrapper-functions for the
          * function-contract, that is attached to the given, function should be
          * inserted.
          * The default-implementation returns the line of the given function.
          */
-        size_t getWrapperInsertLoc(const MatchedFunctionContract &contract);
+        virtual size_t getWrapperInsertLoc(const MatchedFunctionContract &contract);
+
+        /**
+         * Return the line-number where the wrapper-functions for the
+         * given ghost contract should be inserted.
+         * The default-implementation returns the line of the
+         * contract definition.
+         */
+        virtual size_t getWrapperInsertLoc(
+            const MatchedGhostContract &contract);
 
         /**
          * Return the line-number where the wrapper-function for the
@@ -94,14 +140,32 @@ namespace sourcespec2ir
          * function, should be inserted.
          * The default-implementation returns the line of the parent-function.
          */
-        size_t getWrapperInsertLoc(const MatchedLoopInvariantBlock &invBlock);
+        virtual size_t getWrapperInsertLoc(
+            const MatchedLoopInvariantBlock &invBlock);
 
         /**
          * Return the line-number where the wrapper-function for a given
          * specification-statement should be inserted.
          * The default-implementation returns the line of the parent-function.
          */
-        size_t getWrapperInsertLoc(const MatchedSpecStatementBlock &stmntBlock);
+        virtual size_t getWrapperInsertLoc(
+            const MatchedSpecStatementBlock &stmntBlock);
+
+        /**
+         * Return the line number where the wrapper functions for a block of
+         * bindings to given-arguments should be inserted.
+         * The default implementation returns the line of the parent-function.
+         */
+        virtual size_t getWrapperInsertLoc(
+            const MatchedGhostArgBindingBlock &bindingBlock);
+
+        /**
+         * Return the line-number where the wrapper-functions for a given
+         * contract that is mapped to an external or generated function
+         * should be inserted.
+         */
+        virtual size_t getExternalWrapperInsertLoc(
+            const MatchedFunctionContract &contract);
 
         /**
          * Returns a new name for a wrapper-function.
@@ -124,14 +188,16 @@ namespace sourcespec2ir
          */
         void buildSrcWithWrappers(
             const std::string &inPath, const std::string &outPath,
-            llvm::ArrayRef<SrcWrapperFunction *> wrapperFunctions);
+            llvm::ArrayRef<SrcWrapperFunction *> wrapperFunctions,
+            llvm::ArrayRef<SpecPredicate> predicates,
+            llvm::ArrayRef<GhostMethod *> ghostMethods);
 
         /**
-         * Returns a string representation of the given DIType that matches the
+         * Returns a textual representation of the given DIType that matches the
          * types representation on the source-level.
-         * If the string-representation cannot be generated, an error is raised.
+         * If the representation cannot be generated, an error is raised.
          */
-        virtual std::string getSrcReprOfType(const llvm::DIType *type);
+        virtual SrcTypeRepresentation getSrcReprOfType(const llvm::DIType *type);
 
         /**
          * Collects the DILocalVariable-nodes that refer to variables
@@ -158,7 +224,9 @@ namespace sourcespec2ir
         getVarsForStatement(llvm::Instruction *inst);
 
     protected:
+        const std::string srcInFile;
         const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations;
+        const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers;
 
         /**
          * Struct that represents a line of the source-file.
@@ -177,14 +245,52 @@ namespace sourcespec2ir
         };
 
         /**
+         * Return an appropriate SyntaxResolver for the used language.
+         */
+        SourceSyntaxResolver *getSyntaxResolver();
+
+        /**
+         * Build a wrapper-signature based on the given DILocalVariables that
+         * represent the arguments, the return type of the wrapper and the
+         * DIType that represents the return-type` of the parent function.
+         * Frontends can override this to influence the construction of the
+         * wrapper-function's signature.
+         */
+        virtual WrapperSignature getWrapperSignature(
+            const llvm::ArrayRef<llvm::DILocalVariable *> &srcVars,
+            const std::optional<SrcTypeRepresentation> &retType,
+            const llvm::DIType *parentRetTy = nullptr);
+
+        /**
+         * Build a string-representation of an argument from a string of the
+         * arguments type and name.
+         */
+        virtual std::string buildArgStr(const SrcTypeRepresentation &type,
+                                        const std::string &name);
+
+        /**
+         * Constructs a string representation for a DICompositeType with the
+         * DW_TAG_array_type-tag.
+         * Can be overwritten by subclasses if the default-implementation
+         * is not sufficient.
+         */
+        virtual SrcTypeRepresentation getSrcReprOfArrType(
+            const llvm::DICompositeType *type);
+
+        /**
+         * Gets the SrcTypeRepresentation of the `void` type.
+         */
+        virtual SrcTypeRepresentation getVoid();
+
+        /**
          * Adds a const-qualifier to the given base-type.
          */
-        virtual std::string addConst(const std::string &baseType);
+        virtual void addConst(SrcTypeRepresentation &baseType);
 
         /**
          * Adds a pointer-qualifier to the given base-type.
          */
-        virtual std::string addPointer(const std::string &baseType);
+        virtual void addPointer(SrcTypeRepresentation &baseType);
 
         /**
          * Adds a namespace-qualifier to the string represnetation of the given
@@ -198,15 +304,15 @@ namespace sourcespec2ir
          * base-type. Can be overwritten by subclasses.
          * The default-implementation simply throws an error.
          */
-        virtual std::string addReference(const std::string &baseType);
+        virtual void addReference(SrcTypeRepresentation &baseType);
 
         /**
          * Adds a typedef qualifier to the string-representation of the given
          * base-type. Can be overwritten by subclasses.
          * The default-implementation simply throws an error.
          */
-        virtual std::string addTypedef(const std::string &baseType,
-                                       const std::string &typedefName);
+        virtual void addTypedef(SrcTypeRepresentation &baseType,
+                                const std::string &typedefName);
 
         /**
          * This function is called when a different type-tag is encountered that
@@ -214,8 +320,16 @@ namespace sourcespec2ir
          * The default-implementation just throws an error.
          * Subclasses can overwrite this to support other type-tags.
          */
-        virtual std::string addOtherQualifier(const std::string &baseType,
-                                              const llvm::DIDerivedType &type);
+        virtual void addOtherQualifier(SrcTypeRepresentation &baseType,
+                                       const llvm::DIDerivedType &type);
+
+        /**
+         * This function is called to add a dimention to an array-type.
+         * Can be overwritten by subclasses.
+         * The default-implementation simply throws an error.
+         */
+        virtual void addArrayDim(SrcTypeRepresentation &baseType,
+                                 const std::string &dimSize);
 
         /**
          * Function is called after the wrapper-functions and declarations
@@ -223,18 +337,18 @@ namespace sourcespec2ir
          * The default-implementation does nothing.
          * Can be overridden by subclasses to apply constomizations.
          */
-        virtual void modifySrcWithWrappers(std::vector<SrcLine> &srcLines);
+        virtual void modifySrcWithWrappers(std::list<SrcLine> &srcLines);
 
         /**
-         * Given a line-number in the original source-file and a vector of lines
+         * Given a line-number in the original source-file and a list of lines
          * that represents the modified source-file, this function determines
          * the position where a piece of code (e.g. a wrapper-function) should
          * be inserted.
          * The default-implementation selects the first empty line above the
          * given line number of the source-file.
          */
-        std::vector<SrcLine>::iterator findInsertPos(
-            const size_t srcLineNumber, std::vector<SrcLine> &srcLines);
+        std::list<SrcLine>::iterator findInsertPos(
+            const size_t srcLineNumber, std::list<SrcLine> &srcLines);
 
         /**
          * Inserts the given string into the vector of lines at the given index.
@@ -242,8 +356,8 @@ namespace sourcespec2ir
          * is added before the content.
          */
         void insertLines(
-            std::vector<SrcLine> &lines, const std::string &content,
-            std::vector<SrcLine>::iterator currentLine);
+            std::list<SrcLine> &lines, const std::string &content,
+            std::list<SrcLine>::iterator currentLine);
 
     private:
         /* Counter for generating names for the specification functions.
@@ -251,6 +365,8 @@ namespace sourcespec2ir
          *       names into account.
          */
         int specFunCnt = 0;
+
+        std::unique_ptr<SourceSyntaxResolver> syntaxResolver;
 
         /**
          * Used internally to recursively build the namespace for a given type
@@ -260,34 +376,70 @@ namespace sourcespec2ir
         /**
          * Reads the given source-file and converts it into a vector of lines.
          */
-        std::unique_ptr<std::vector<SrcLine>> readSrcFile(std::string filePath);
+        std::unique_ptr<std::list<SrcLine>> readSrcFile(std::string filePath);
 
         /**
          * Writes the given vector of lines into a file at the given location.
          */
         void writeSrcFile(const std::string &filePath,
-                          const std::vector<SrcLine> &lines);
+                          const std::list<SrcLine> &lines);
 
         /**
          * Creates a wrapping-function for every statement in the
          * given contract-block.
          */
-        void wrapFunctionContractBlock(const MatchedFunctionContract &contract,
-                                       MatchedWrapperFunctions &matchedWrappers);
+        void wrapFunctionContractBlock(
+            const MatchedFunctionContract &contract,
+            MatchedWrapperFunctions &matchedWrappers);
+
+        /**
+         * Creates a wrapping-function for every statement in the
+         * given ghost contract.
+         */
+        void wrapGhostContract(
+            const MatchedGhostContract &contract,
+            MatchedWrapperFunctions &matchedWrappers);
 
         /**
          * Creates a wrapping-function for every statement in the
          * given loop-invariant-block.
          */
-        void wrapLoopInvariantBlock(const MatchedLoopInvariantBlock &invBlock,
-                                    MatchedWrapperFunctions &matchedWrappers);
+        void wrapLoopInvariantBlock(
+            const MatchedLoopInvariantBlock &invBlock,
+            const MatchedFunctionContract *parentContract,
+            MatchedWrapperFunctions &matchedWrappers);
 
         /**
          * Creates a wrapping-function for every statement in the
          * given statement-block.
          */
-        void wrapSpecStatementBlock(const MatchedSpecStatementBlock &stmntBlock,
-                                    MatchedWrapperFunctions &matchedWrappers);
+        void wrapSpecStatementBlock(
+            const MatchedSpecStatementBlock &stmntBlock,
+            const MatchedFunctionContract *parentContract,
+            MatchedWrapperFunctions &matchedWrappers);
+
+        void wrapGivenArgBlock(
+            const MatchedGhostArgBindingBlock &bindingBlock,
+            const MatchedFunctionContract *parentContract,
+            const MatchedFunctionContract *calledContract,
+            MatchedWrapperFunctions &matchedWrappers);
+
+        /**
+         * Adds the ghost arguments from the given contract to the given
+         * wrapper signature.
+         */
+        void addGhostArgsToSig(WrapperSignature &sig,
+                               const MatchedFunctionContract &contr,
+                               bool skipYields = false);
+
+        /**
+         * Extracts the names of the given and yields arguments and adds them
+         * to the corresponding vectors.
+         * If contr is null, nothing happens.
+         */
+        void addGhostArgNames(const MatchedFunctionContract *contr,
+                              llvm::SmallVector<std::string> &givenArgs,
+                              llvm::SmallVector<std::string> &yieldsArgs);
     };
 
 }

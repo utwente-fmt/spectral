@@ -2,7 +2,8 @@
 #define PALLAS_SWIFTWRAPPERGENERATOR_H
 
 #include "SourceWrapperGenerator.h"
-
+#include "SwiftDemangler.h"
+#include <llvm/ADT/StringRef.h>
 namespace sourcespec2ir
 {
 
@@ -12,36 +13,54 @@ namespace sourcespec2ir
     class SwiftWrapperGenerator : public SourceWrapperGenerator
     {
     public:
-
-        SwiftWrapperGenerator(const llvm::ArrayRef<SpecDeclaration> specDeclarations);
+        SwiftWrapperGenerator(
+            const std::string srcInFile,
+            const llvm::ArrayRef<SpecDeclaration> specDeclarations,
+            const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
+            std::unique_ptr<SourceSyntaxResolver> syntaxResolver);
 
         std::string getWrapperFunctionString(
-            const llvm::ArrayRef<llvm::DILocalVariable *> &srcVars,
+            const WrapperSignature &sig,
             const std::string &expr,
-            const std::string &functionName, 
-            const llvm::DIType *returnType) override;
+            const std::string &functionName) override;
+
+        std::string getPredicateDefString(const std::string &name,
+                                          const std::string &args,
+                                          const std::string &body) override;
 
         std::pair<size_t, size_t> getOffsetToExprStart(
             const SrcWrapperFunction &wFun) override;
 
-        /* 
-         * In swift, the debug-info for e.g. the Boolean-type does not always 
+        std::pair<size_t, size_t> getOffsetToExprStart(
+            const SpecPredicate &pDef) override;
+
+        /*
+         * In swift, the debug-info for e.g. the Boolean-type does not always
          * get resolved properly. Hence, manually patch this.
          */
-        std::string getSrcReprOfType(const llvm::DIType *type) override;
+        SrcTypeRepresentation getSrcReprOfType(const llvm::DIType *type) override;
 
     protected:
         // Overwritten methods to customize the default-WrapperGenerator
-        std::string addConst(const std::string &baseType) override;
-        std::string addTypedef(const std::string &baseType,
-                               const std::string &typedefName) override;
-        void modifySrcWithWrappers(std::vector<SrcLine> &srcLines) override;
+        void addConst(SrcTypeRepresentation &baseType) override;
+        void addTypedef(SrcTypeRepresentation &baseType,
+                        const std::string &typedefName) override;
+        void addOtherQualifier(SrcTypeRepresentation &baseType,
+                               const llvm::DIDerivedType &type) override;
+        void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;
+
+        std::string buildArgStr(const SrcTypeRepresentation &type,
+                                const std::string &name) override;
 
     private:
+        SwiftDemangler demangler;
+
+        // TODO: Instead of doing this here, we might want to handle the
+        //      predicate arguments similar to the arguments on external
+        //      contracts and separate them during parsing!
+        WrapperSignature getSigFromPredicateArgs(llvm::StringRef argStr);
         std::string generateSpecLibFunctions(
-            const llvm::ArrayRef<llvm::DILocalVariable *> &srcVars, 
-            const llvm::DIType *returnType, 
-            const std::string &expr);
+            const WrapperSignature &sig, const std::string &expr);
     };
 
 }

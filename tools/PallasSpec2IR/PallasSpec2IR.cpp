@@ -7,6 +7,7 @@
 #include "utils/OutputConfig.h"
 #include "utils/PallasException.h"
 
+#include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/raw_ostream.h>
 #include <chrono>
@@ -61,6 +62,12 @@ static llvm::cl::opt<std::string> clLibPath(
     "lib", llvm::cl::desc("Path to specification-library"),
     llvm::cl::value_desc("Directory of the specification library"),
     llvm::cl::init("../../res/spec_libs/c/"),
+    llvm::cl::cat(SpecTransformCat));
+
+static llvm::cl::list<std::string> clCLibPath(
+    "cLib",
+    llvm::cl::desc("Path to a file containing contract specifications"),
+    llvm::cl::value_desc("Path to contract-file"),
     llvm::cl::cat(SpecTransformCat));
 
 static llvm::cl::opt<ClSourceLang> clLang(
@@ -125,11 +132,19 @@ int main(int argc, char **argv)
             llvm::outs() << "Infered source-language as: " << langNames[lang] << "\n";
     }
 
+    // Get paths to contract-files
+    llvm::SmallVector<std::string> contractFiles;
+    for (auto path : clCLibPath)
+        contractFiles.push_back(path);
+
     if (config.printDebugInfo)
     {
         llvm::outs() << "Source-language set to " << langNames[lang] << " \n";
         llvm::outs() << "From: " << clInFile << " to: " << clOutFile << "\n";
         llvm::outs() << "Working directory: " << clWorkDir << "\n";
+        llvm::outs() << "External contracts: \n";
+        for (auto p : contractFiles)
+            llvm::outs() << "  - " << p << "\n";
     }
 
     try
@@ -139,13 +154,15 @@ int main(int argc, char **argv)
             sourcespec2ir::CSpecTransformer transformer(
                 std::make_unique<sourcespec2ir::CCompilerDriver>(clLibPath, clWorkDir),
                 std::make_unique<sourcespec2ir::CSpecUnifier>(config.printUnificationInfo),
-                clInFile, clOutFile, config, clWorkDir, clMem2Reg);
+                clInFile, clOutFile, contractFiles, config,
+                clWorkDir, clMem2Reg);
             transformer.transformModule();
         }
         else if (lang == Cpp)
         {
             sourcespec2ir::CppSpecTransformer transformer(
-                clLibPath, clInFile, clOutFile, config, clWorkDir, clMem2Reg);
+                clLibPath, clInFile, clOutFile, contractFiles, config,
+                clWorkDir, clMem2Reg);
             transformer.transformModule();
         }
         else if (lang == Rust)
@@ -157,7 +174,8 @@ int main(int argc, char **argv)
         else if (lang == Swift)
         {
             sourcespec2ir::SwiftSpecTransformer transformer(
-                clLibPath, clInFile, clOutFile, config, clWorkDir, clMem2Reg);
+                clLibPath, clInFile, clOutFile, contractFiles, config,
+                clWorkDir, clMem2Reg);
             transformer.transformModule();
         }
     }
