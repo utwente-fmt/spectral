@@ -42,12 +42,12 @@ namespace sourcespec2ir
         call << " -g ";
         call << " -C opt-level=0";
         call << " --crate-type lib ";
+        call << " --edition=2021 ";
         // Disable overflow-checks with '-C debug-assertions=false' ?!
-        // Set language-edition to 2021 ?!
         // TODO: Do we want to set panic = "abort" ???
         // TODO: Check if MIR optimizations also have to be disabled
-        call << " -o " << irOutStr;
-        call << " -L " << specLibPath << "/ ";
+        call << " -o " << irOutStr << " ";
+        call << "--extern rust_spec="<< specLibPath << " ";
         call << srcFilePath;
 
         auto eCode = std::system(call.str().c_str());

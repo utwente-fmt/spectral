@@ -30,14 +30,11 @@ namespace sourcespec2ir
 
         std::stringstream stream;
 
-        // Insert static function-pointer with #[used] to ensure that
-        // code for the wrapper is generated even though it is not called.
-        stream << "#[used]\n"
-               << "static PRESERVE_" << functionName << ": fn() = "
-               << functionName << ";\n";
-
         // Build wrapper itself:
-        stream << "#[allow(unused_variables)]\n"
+        // Force codegen of wrapper even though it is not called
+        stream << "#[no_mangle]\n"
+               << "#[allow(unused_variables)]\n"
+               << "#[allow(unused_imports)]\n"
                << "fn " << functionName << "(";
 
         // Arg-list (vars passed as immutable references)
@@ -54,6 +51,7 @@ namespace sourcespec2ir
         }
 
         stream << ") -> " << rType << " {\n"
+               << "use rust_spec::*;\n"
                << expr << "\n"
                << "}" << "\n";
 
@@ -63,7 +61,7 @@ namespace sourcespec2ir
     std::pair<size_t, size_t> RustWrapperGenerator::getOffsetToExprStart(
         const SrcWrapperFunction &wFun)
     {
-        return std::make_pair(4, 0);
+        return std::make_pair(2, 0);
     }
 
     std::string RustWrapperGenerator::getPredicateDefString(
@@ -72,11 +70,9 @@ namespace sourcespec2ir
     {
         std::stringstream stream;
 
-        // Force function to be compiled even though it is not called
-        stream << "#[used]\n"
-               << "static PRESERVE_" << name << ": fn() = " << name << ";\n";
-
-        stream << "#[allow(unused_variables)]\n"
+        stream << "#[no_mangle]\n"
+               << "#[allow(unused_variables)]\n"
+               << "#[allow(unused_imports)]\n"
                << "fn " << name << "(";
 
         llvm::SmallVector<llvm::StringRef> argVec;
@@ -92,6 +88,7 @@ namespace sourcespec2ir
         }
 
         stream << ") -> bool {\n"
+               << "use rust_spec::*;\n"
                << body << "\n"
                << "}\n";
 
@@ -101,7 +98,7 @@ namespace sourcespec2ir
     std::pair<size_t, size_t> RustWrapperGenerator::getOffsetToExprStart(
         const SpecPredicate &pDef)
     {
-        return std::make_pair(4, 0);
+        return std::make_pair(2, 0);
     }
 
     std::string RustWrapperGenerator::getNameForWrapperFunction()
@@ -120,7 +117,6 @@ namespace sourcespec2ir
 
     void RustWrapperGenerator::modifySrcWithWrappers(std::list<SrcLine> &srcLines)
     {
-
         // Add content of the declaration-block to the file.
         for (auto &decl : specDeclarations)
         {
@@ -129,13 +125,6 @@ namespace sourcespec2ir
                 decl.srcLoc.getStartLine(), srcLines);
             insertLines(srcLines, declStr, insertPos);
         }
-
-        // TODO: Add include for the specification-library to the top of the
-        // generated file?
-        // This has to be placed under the #![no_main] macro if present
-        // srcLines.insert(srcLines.begin(),
-        //                SrcLine("#include \"cpp_spec_lib.h\"", 0));
-        // TODO: Add a use::rust_spec to the top of the file.
     }
 
 }
