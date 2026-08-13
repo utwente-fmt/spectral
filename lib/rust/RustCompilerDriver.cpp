@@ -36,11 +36,15 @@ namespace sourcespec2ir
 
         // Run compiler to generate the IR
         std::stringstream call;
+        // TODO: We could also call 'cargo rustc' instead?
         call << " rustc ";
         call << " --emit=llvm-ir ";
         call << " -g ";
         call << " -C opt-level=0";
         call << " --crate-type lib ";
+        // Disable overflow-checks with '-C debug-assertions=false' ?!
+        // Set language-edition to 2021 ?!
+        // TODO: Do we want to set panic = "abort" ???
         // TODO: Check if MIR optimizations also have to be disabled
         call << " -o " << irOutStr;
         call << " -L " << specLibPath << "/ ";

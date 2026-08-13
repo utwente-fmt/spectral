@@ -19,10 +19,10 @@ namespace sourcespec2ir
     class RustSpecUnifier : public SpecUnifier
     {
     public:
-
+        // TODO: Move concrete names to RustNameConstant.h!
 
         const std::string RUST_SPEC_NAMESPACE = "rust_spec";
-        // Map names of functions of the specification-library to the 
+        // Map names of functions of the specification-library to the
         // corresponding enum-representation.
         const llvm::StringMap<SpecLibElement> EXACT_MATCH_NAME_MAP = {
             //{"_imply(bool, bool)", Imply},
@@ -31,7 +31,7 @@ namespace sourcespec2ir
             //{"_exists(bool, bool)", Exists},
             //{"_forall(bool, bool)", Forall},
             //{"_forallS(bool, bool)", ForallSep},
-            //{"_fracOf(int, int)", FracOf}, 
+            //{"_fracOf(int, int)", FracOf},
             //{"_sep(bool, bool)", SepConj}
         };
 
@@ -40,24 +40,19 @@ namespace sourcespec2ir
             {"_result", Result},
             {"_imply", Imply}, // Check if this can be done with an exact match
             {"_and", ScAnd},
-            {"_or", ScOr}, 
+            {"_or", ScOr},
             {"_sep", SepConj},
             //{"_bv<", BoundVar},
             //{"_seqNew<", SeqNew},
             //{"_seqSize<", SeqSize},
             //{"_seqGet<", SeqGet},
             //{"_seqPrepend<", SeqPrepend},
-            //{"_seqEquals<", SeqEquals}, 
-            //{"_Perm<", Perm}, 
+            //{"_seqEquals<", SeqEquals},
+            //{"_Perm<", Perm},
             //{"_ptrBlockLength<", PtrBlockLength},
             //{"_ptrBlockOffset<", PtrBlockOffset},
             //{"_ptrLength<", PtrLength}
         };
-
-        /*
-        const std::string CPP_SPEC_FRAC_TYPE = "struct.pallasSpec::frac";
-        const std::string CPP_SPEC_SEQ_TYPE_BASE = "struct.pallasSpec::seq";
-        */
 
         RustSpecUnifier(const bool printDebugInfo);
 
@@ -70,6 +65,8 @@ namespace sourcespec2ir
         llvm::Type *getContentTypeOfADTTy(const llvm::Type &t) override;
 
         llvm::Type *getSrcLibFracType() override;
+
+        // TODO: Override default implementations of unification where necessary
     };
 
 }

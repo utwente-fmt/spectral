@@ -9,16 +9,26 @@ namespace sourcespec2ir
     class RustWrapperGenerator : public SourceWrapperGenerator
     {
     public:
-        RustWrapperGenerator(const llvm::ArrayRef<SpecDeclaration> specDeclarations);
+        RustWrapperGenerator(
+            const std::string srcInFile,
+            const llvm::ArrayRef<SpecDeclaration> specDeclarations,
+            const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
+            std::unique_ptr<SourceSyntaxResolver> syntaxResolver);
 
         std::string getWrapperFunctionString(
-            const llvm::ArrayRef<llvm::DILocalVariable *> &srcVars,
+            const WrapperSignature &sig,
             const std::string &expr,
-            const std::string &functionName,
-            const llvm::DIType *returnType) override;
+            const std::string &functionName) override;
+
+        std::string getPredicateDefString(const std::string &name,
+                                          const std::string &args,
+                                          const std::string &body) override;
 
         std::pair<size_t, size_t> getOffsetToExprStart(
             const SrcWrapperFunction &wFun) override;
+
+        std::pair<size_t, size_t> getOffsetToExprStart(
+            const SpecPredicate &pDef) override;
 
         std::string getNameForWrapperFunction() override;
 
@@ -34,9 +44,12 @@ namespace sourcespec2ir
         std::string addNamespace(const std::string &parentNamespace,
                                  const std::string &childNamespace) override;
         */
-       void modifySrcWithWrappers(std::vector<SrcLine> &srcLines) override;
+        void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;
 
-    private: 
+        std::string buildArgStr(const SrcTypeRepresentation &type,
+                                const std::string &name) override;
+
+    private:
         int wrapperCnt = 0;
     };
 

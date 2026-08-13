@@ -9,38 +9,53 @@
 namespace sourcespec2ir
 {
     RustWrapperGenerator::RustWrapperGenerator(
-        const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations)
-        : SourceWrapperGenerator(specDeclarations)
+        const std::string srcInFile,
+        const llvm::ArrayRef<SpecDeclaration> specDeclarations,
+        const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
+        std::unique_ptr<SourceSyntaxResolver> syntaxResolver)
+        : SourceWrapperGenerator(
+              srcInFile, specDeclarations, wrapperMarkers,
+              std::move(syntaxResolver))
     {
     }
 
     std::string RustWrapperGenerator::getWrapperFunctionString(
-        const llvm::ArrayRef<llvm::DILocalVariable *> &srcVars,
+        const WrapperSignature &sig,
         const std::string &expr,
-        const std::string &functionName,
-        const llvm::DIType *returnType)
+        const std::string &functionName)
     {
+        auto rType = sig.returnTy.has_value()
+                         ? sig.returnTy.value().prefix.str().str()
+                         : "bool";
+
         std::stringstream stream;
-        // TODO: Find another way to disable compiler from removing unsed
-        //  functions. pub will not always work.
-        stream << "#[allow(unused_variables)]\n";
-        stream << "pub fn " << functionName << "(";
+
+        // Insert static function-pointer with #[used] to ensure that
+        // code for the wrapper is generated even though it is not called.
+        stream << "#[used]\n"
+               << "static PRESERVE_" << functionName << ": fn() = "
+               << functionName << ";\n";
+
+        // Build wrapper itself:
+        stream << "#[allow(unused_variables)]\n"
+               << "fn " << functionName << "(";
 
         // Arg-list (vars passed as immutable references)
-        for (auto it = srcVars.begin(), end = srcVars.end(); it != end; ++it)
+        bool first = true;
+        for (auto &arg : sig.args)
         {
-            if (it != srcVars.begin())
+            // Skip 'self'-arg as it gets added implicitly
+            if (arg.ends_with(" self"))
+                continue;
+            if (!first)
                 stream << ", ";
-            const auto varName = utils::getSrcVarName(**it);
-            const auto varType = getSrcReprOfType((*it)->getType());
-            stream << varName << ": " << "&" << varType;
+            stream << arg;
+            first = false;
         }
-        stream << ") -> bool ";
 
-        // Body
-        stream << "{" << "\n";
-        stream << expr << "\n";
-        stream << "}" << "\n";
+        stream << ") -> " << rType << " {\n"
+               << expr << "\n"
+               << "}" << "\n";
 
         return stream.str();
     }
@@ -48,8 +63,45 @@ namespace sourcespec2ir
     std::pair<size_t, size_t> RustWrapperGenerator::getOffsetToExprStart(
         const SrcWrapperFunction &wFun)
     {
-        // TODO: Implement for Rust
-        return std::make_pair(2, 0);
+        return std::make_pair(4, 0);
+    }
+
+    std::string RustWrapperGenerator::getPredicateDefString(
+        const std::string &name, const std::string &args,
+        const std::string &body)
+    {
+        std::stringstream stream;
+
+        // Force function to be compiled even though it is not called
+        stream << "#[used]\n"
+               << "static PRESERVE_" << name << ": fn() = " << name << ";\n";
+
+        stream << "#[allow(unused_variables)]\n"
+               << "fn " << name << "(";
+
+        llvm::SmallVector<llvm::StringRef> argVec;
+        llvm::StringRef(args).split(argVec, ',');
+        bool first = true;
+        for (auto arg : argVec)
+        {
+            auto [name, type] = arg.split(':');
+            if (!first)
+                stream << ", ";
+            stream << name.str() << ": &" << type.str();
+            first = false;
+        }
+
+        stream << ") -> bool {\n"
+               << body << "\n"
+               << "}\n";
+
+        return stream.str();
+    }
+
+    std::pair<size_t, size_t> RustWrapperGenerator::getOffsetToExprStart(
+        const SpecPredicate &pDef)
+    {
+        return std::make_pair(4, 0);
     }
 
     std::string RustWrapperGenerator::getNameForWrapperFunction()
@@ -57,19 +109,29 @@ namespace sourcespec2ir
         return RUST_WRAPPER_PREFIX + std::to_string(wrapperCnt++);
     }
 
-    void RustWrapperGenerator::modifySrcWithWrappers(std::vector<SrcLine> &srcLines)
+    std::string RustWrapperGenerator::buildArgStr(
+        const SrcTypeRepresentation &type, const std::string &name)
+    {
+        if (!type.suffix.empty())
+            throw utils::PallasException(
+                "Unexpected suffix in type representation");
+        return name + ": &" + type.prefix.str().str();
+    }
+
+    void RustWrapperGenerator::modifySrcWithWrappers(std::list<SrcLine> &srcLines)
     {
 
         // Add content of the declaration-block to the file.
         for (auto &decl : specDeclarations)
         {
             auto declStr = decl.content + ";";
-            auto insertPos = findInsertPos(decl.srcFileLine, srcLines);
+            auto insertPos = findInsertPos(
+                decl.srcLoc.getStartLine(), srcLines);
             insertLines(srcLines, declStr, insertPos);
         }
 
-        // Add include for the specification-library to the top of the
-        // generated file.
+        // TODO: Add include for the specification-library to the top of the
+        // generated file?
         // This has to be placed under the #![no_main] macro if present
         // srcLines.insert(srcLines.begin(),
         //                SrcLine("#include \"cpp_spec_lib.h\"", 0));

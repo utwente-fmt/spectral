@@ -17,6 +17,8 @@ namespace sourcespec2ir
     RustSpecUnifier::isSrcSpecificationFunction(const llvm::Function &f)
     {
         // Implement: Make less bad, check scope
+        // TODO: Implement this, support RUst name-mangling
+
         auto fName = f.getName().str();
         auto nameDemangle = llvm::demangle(fName);
         // llvm::outs() << "Demangle " << fName << " --> " << nameDemangle << "\n";
@@ -48,13 +50,13 @@ namespace sourcespec2ir
 
     bool RustSpecUnifier::isSrcSeqType(const llvm::StructType &t)
     {
-        // TODO: Implement similar to Rust
+        // TODO: Implement similar to C++
         return false;
     }
 
     llvm::Type *RustSpecUnifier::getSrcLibFracType()
     {
-        // TODO: Implement similar to Rust
+        // TODO: Implement similar to C++
         return nullptr;
     }
 

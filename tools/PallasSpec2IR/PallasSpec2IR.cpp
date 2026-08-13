@@ -168,7 +168,8 @@ int main(int argc, char **argv)
         else if (lang == Rust)
         {
             sourcespec2ir::RustSpecTransformer transformer(
-                clLibPath, clInFile, clOutFile, config, clWorkDir, clMem2Reg);
+                clLibPath, clInFile, clOutFile, contractFiles, config,
+                clWorkDir, clMem2Reg);
             transformer.transformModule();
         }
         else if (lang == Swift)

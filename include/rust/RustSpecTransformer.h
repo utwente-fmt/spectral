@@ -15,13 +15,17 @@ namespace sourcespec2ir
         RustSpecTransformer(
             std::string specLibPath,
             std::string srcInPath, std::string outPath,
-            const utils::OutputConfig &outputConfig, 
-            const std::string &workingDir, 
+            llvm::SmallVector<std::string> extContractPaths,
+            const utils::OutputConfig &outputConfig,
+            const std::string &workingDir,
             bool runMem2Reg);
+
     protected:
         std::unique_ptr<SourceWrapperGenerator> createWrapperGenerator(
-            const llvm::SmallVector<SpecDeclaration> &specDeclarations
-        ) override;
+            const llvm::SmallVector<SpecDeclaration> &specDeclarations,
+            const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers) override;
+
+        // TODO: Check if virtual std::unique_ptr<SourceSyntaxResolver> createSyntaxResolver(); need to be changed!
     };
 
 }

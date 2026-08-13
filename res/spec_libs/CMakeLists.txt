@@ -9,7 +9,7 @@ add_custom_target(BuildSwiftLib # ALL
 
 # Target that builds the specification-library for Rust.
 add_custom_target(BuildRustLib 
-    COMMAND cargo build 
+    COMMAND cargo build --profile=dev
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/res/spec_libs/rust/rust_spec
     COMMENT "Building Rust specification library"
 ) 

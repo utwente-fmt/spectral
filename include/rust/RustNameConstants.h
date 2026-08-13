@@ -11,6 +11,8 @@ namespace sourcespec2ir
 
     // Prefix of generated wrapper-functions
     const std::string RUST_WRAPPER_PREFIX = "pallas_spec_";
+
+    // TODO: Move the names of the spec-lib here!
 }
 
 #endif // PALLAS_RUSTNAMECONSTANTS_H
