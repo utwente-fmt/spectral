@@ -1,5 +1,6 @@
 #include "RustSpecUnifier.h"
 #include "PallasException.h"
+#include "RustNameConstants.h"
 
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Demangle/Demangle.h>
@@ -17,7 +18,6 @@ namespace sourcespec2ir
     RustSpecUnifier::isSrcSpecificationFunction(const llvm::Function &f)
     {
         // Implement: Make less bad, check scope
-        // TODO: Implement this, support RUst name-mangling
 
         auto fName = f.getName().str();
         auto nameDemangle = llvm::demangle(fName);
@@ -27,11 +27,6 @@ namespace sourcespec2ir
         auto nameCrop = llvm::StringRef(nameDemangle);
         if (!nameCrop.consume_front(RUST_SPEC_NAMESPACE + "::"))
             return std::nullopt;
-
-        // Check exact matches
-        auto exactMatch = EXACT_MATCH_NAME_MAP.find(nameCrop);
-        if (exactMatch != EXACT_MATCH_NAME_MAP.end())
-            return std::make_optional<SpecLibElement>(exactMatch->getValue());
 
         // Check prefix-matches
         for (auto key : PREFIX_MATCH_NAME_MAP.keys())

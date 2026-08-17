@@ -267,6 +267,9 @@ namespace sourcespec2ir
         else if (path.ends_with(".swift"))
         {
             lang = llvm::dwarf::DW_LANG_Swift;
+        } else if (path.ends_with(".rs")) 
+        {
+            lang = llvm::dwarf::DW_LANG_Rust;
         }
 
         llvm::DIBuilder builder(*irModule);

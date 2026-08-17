@@ -12,7 +12,14 @@ namespace sourcespec2ir
     // Prefix of generated wrapper-functions
     const std::string RUST_WRAPPER_PREFIX = "pallas_spec_";
 
-    // TODO: Move the names of the spec-lib here!
+    const std::string RUST_SPEC_NAMESPACE = "rust_spec";
+
+    const std::string RUST_SPEC_IMPLY = "_imply";
+    const std::string RUST_SPEC_SCAND = "_and";
+    const std::string RUST_SPEC_SCOR = "_or";
+    const std::string RUST_SPEC_SEP = "_sep";
+    const std::string RUST_SPEC_RESULT = "_result";
+
 }
 
 #endif // PALLAS_RUSTNAMECONSTANTS_H
