@@ -212,11 +212,6 @@ namespace sourcespec2ir
                     throw utils::PallasException(
                         "Encountered an instruction between contract and function.");
                 }
-                else if (iLine >= endLine && iLine == closestLine && !isDebugIntrinsic)
-                {
-                    throw utils::PallasException(
-                        "Encountered an instruction on the same line as the function.");
-                }
             }
         }
         // Check that no global variables are between the specification and
