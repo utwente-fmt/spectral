@@ -29,14 +29,14 @@ pub fn _result<T>() -> T { unimplemented!(); }
  *  Quantifiers
  */
 #[inline(never)]
-pub fn _forall(_range: &bool, _expr: &bool) -> bool { unimplemented!(); }
+pub fn _forall(_range: bool, _expr: bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
 #[allow(non_snake_case)]
-pub fn _forallS(_range: &bool, _expr: &bool) -> bool { unimplemented!(); }
+pub fn _forallS(_range: bool, _expr: bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
-pub fn _exists(_range: &bool, _expr: &bool) -> bool { unimplemented!(); }
+pub fn _exists(_range: bool, _expr: bool) -> bool { unimplemented!(); }
 
 #[inline(never)]
 pub fn _bv<T>(_id: &str) -> T { unimplemented!(); }

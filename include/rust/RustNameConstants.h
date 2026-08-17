@@ -19,6 +19,9 @@ namespace sourcespec2ir
     const std::string RUST_SPEC_SCOR = "_or";
     const std::string RUST_SPEC_SEP = "_sep";
     const std::string RUST_SPEC_RESULT = "_result";
+    const std::string RUST_SPEC_EXISTS = "_exists";
+    const std::string RUST_SPEC_FORALL = "_forall";
+    const std::string RUST_SPEC_FORALLS = "_forallS";
 
 }
 

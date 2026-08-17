@@ -26,6 +26,9 @@ namespace sourcespec2ir
             {RUST_SPEC_SCAND, ScAnd},
             {RUST_SPEC_SCOR, ScOr},
             {RUST_SPEC_SEP, SepConj},
+            {RUST_SPEC_EXISTS, Exists},
+            {RUST_SPEC_FORALL, Forall},
+            {RUST_SPEC_FORALLS, ForallSep}
             //{"_old<", Old},
             //{"_bv<", BoundVar},
             //{"_seqNew<", SeqNew},
