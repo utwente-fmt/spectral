@@ -32,7 +32,8 @@ namespace sourcespec2ir
             {RUST_SPEC_RESULT, Result}, 
             {RUST_SPEC_BV, BoundVar}, 
             {RUST_SPEC_FRAC_OF, FracOf}, 
-            {RUST_SPEC_PERM, Perm}
+            {RUST_SPEC_PERM, Perm}, 
+            {RUST_SPEC_UNFOLDING, Unfolding}
             //{"_seqNew<", SeqNew},
             //{"_seqSize<", SeqSize},
             //{"_seqGet<", SeqGet},

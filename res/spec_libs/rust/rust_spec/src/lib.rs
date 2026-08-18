@@ -62,15 +62,19 @@ impl Frac {
     pub fn of(_num: i32, _denom: i32) -> Frac { unimplemented!(); } 
 }
 
-// #[inline(never)]
-// pub fn _frac(_num: i32, _denom: i32) -> Frac { unimplemented!(); }
-
 // We make this an 'extern "C"' to simplify the unification-stage!
 #[inline(never)]
 #[allow(non_snake_case)]
 pub extern "C" fn _Perm<T>(_loc: &T, _p: Frac) -> bool { unimplemented!(); }
 
 // TODO: Do we need pointer_length etc?
+
+/* 
+ *  Predicates
+ */
+// TODO: Do we need #[allow(improper-ctypes-definitions)]
+#[inline(never)]
+pub extern "C" fn _unfolding<T>(_pred: bool, _in: T) -> T { unimplemented!(); }
 
 // TODO: Add the sequence ADTs
 

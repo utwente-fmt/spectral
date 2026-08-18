@@ -26,6 +26,7 @@ namespace sourcespec2ir
     const std::string RUST_SPEC_BV = "_bv";
     const std::string RUST_SPEC_FRAC_OF = "Frac::of";
     const std::string RUST_SPEC_PERM = "_Perm";
+    const std::string RUST_SPEC_UNFOLDING = "_unfolding";
 
     const std::string RUST_SPEC_FRAC_TYPE = "rust_spec::Frac";
 }
