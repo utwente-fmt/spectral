@@ -22,6 +22,8 @@ namespace sourcespec2ir
     const std::string RUST_SPEC_EXISTS = "_exists";
     const std::string RUST_SPEC_FORALL = "_forall";
     const std::string RUST_SPEC_FORALLS = "_forallS";
+    const std::string RUST_SPEC_OLD = "_old";
+    const std::string RUST_SPEC_BV = "_bv";
 
 }
 

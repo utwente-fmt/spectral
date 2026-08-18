@@ -41,10 +41,11 @@ namespace sourcespec2ir
         std::string addReference(const std::string &baseType) override;
         std::string addTypedef(const std::string &baseType,
                                const std::string &typedefName) override;
-        std::string addNamespace(const std::string &parentNamespace,
-                                 const std::string &childNamespace) override;
         */
         void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;
+
+        std::string addNamespace(const std::string &parentNamespace,
+                                 const std::string &childNamespace) override;
 
         std::string buildArgStr(const SrcTypeRepresentation &type,
                                 const std::string &name) override;

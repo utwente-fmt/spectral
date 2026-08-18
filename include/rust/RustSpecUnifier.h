@@ -21,14 +21,16 @@ namespace sourcespec2ir
     {
     public:
         const llvm::StringMap<SpecLibElement> PREFIX_MATCH_NAME_MAP = {
-            {RUST_SPEC_RESULT, Result},
             {RUST_SPEC_IMPLY, Imply},
             {RUST_SPEC_SCAND, ScAnd},
             {RUST_SPEC_SCOR, ScOr},
             {RUST_SPEC_SEP, SepConj},
             {RUST_SPEC_EXISTS, Exists},
             {RUST_SPEC_FORALL, Forall},
-            {RUST_SPEC_FORALLS, ForallSep}
+            {RUST_SPEC_FORALLS, ForallSep},
+            {RUST_SPEC_OLD, Old},
+            {RUST_SPEC_RESULT, Result}, 
+            {RUST_SPEC_BV, BoundVar}
             //{"_old<", Old},
             //{"_bv<", BoundVar},
             //{"_seqNew<", SeqNew},
@@ -53,6 +55,8 @@ namespace sourcespec2ir
         llvm::Type *getContentTypeOfADTTy(const llvm::Type &t) override;
 
         llvm::Type *getSrcLibFracType() override;
+
+        llvm::CallInst *transformBoundVar(llvm::CallInst &oldCall) override;
     };
 
 }

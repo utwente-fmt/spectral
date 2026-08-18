@@ -293,7 +293,7 @@ namespace sourcespec2ir
         virtual void addPointer(SrcTypeRepresentation &baseType);
 
         /**
-         * Adds a namespace-qualifier to the string represnetation of the given
+         * Adds a namespace-qualifier to the string representation of the given
          * parent-namespace.
          */
         virtual std::string addNamespace(const std::string &parentNamespace,

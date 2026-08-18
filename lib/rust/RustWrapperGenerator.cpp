@@ -127,4 +127,11 @@ namespace sourcespec2ir
         }
     }
 
+    std::string RustWrapperGenerator::addNamespace(
+        const std::string &parentNamespace, const std::string &childNamespace)
+    {
+        // Ignore namespaces for now
+        return parentNamespace;
+    }
+
 }

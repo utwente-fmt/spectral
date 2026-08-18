@@ -20,7 +20,7 @@ pub fn _sep(_a: bool, _b: bool) -> bool { unimplemented!(); }
  *  Specification constructs
  */
 #[inline(never)]
-pub fn _old<T>(_e: &T) -> T { unimplemented!(); }
+pub fn _old<T>(_e: T) -> T { unimplemented!(); }
 
 #[inline(never)]
 pub fn _result<T>() -> T { unimplemented!(); }
