@@ -47,25 +47,28 @@ pub fn _bv<T>(_id: &str) -> T { unimplemented!(); }
  *  Permissions
  */
 
- // Placeholders ensure that the struct is sufficiently large so that the 
- //     compiler does not attempt to deconstruct it for ABI compliance. 
+ // The struct contains a "randomly"-sized and unreasonably large array
+ // to prevent it from being merged with a user's type and from optimized
+ // by the compiler.
  #[allow(dead_code)]
+ #[repr(C)]
+ #[derive(Copy, Clone)]
 pub struct Frac {
-    pub placeholder_1: i64,
-    pub placeholder_2: i64,
-    pub placeholder_3: i64,
-    pub placeholder_4: i64,
-    pub placeholder_5: i64
+    pub dummy: [i32; 0x66726163],
 }
 
-#[inline(never)]
-pub fn _frac(_num: i32, _denom: i32) -> Frac { unimplemented!(); }
+impl Frac {
+    #[inline(never)]
+    pub fn of(_num: i32, _denom: i32) -> Frac { unimplemented!(); } 
+}
 
-// TODO: What should the _perm function look like?
-//       This is only a prototype
+// #[inline(never)]
+// pub fn _frac(_num: i32, _denom: i32) -> Frac { unimplemented!(); }
+
+// We make this an 'extern "C"' to simplify the unification-stage!
 #[inline(never)]
 #[allow(non_snake_case)]
-pub fn _Perm<T>(_loc: &T, _p: Frac) -> bool { unimplemented!(); }
+pub extern "C" fn _Perm<T>(_loc: &T, _p: Frac) -> bool { unimplemented!(); }
 
 // TODO: Do we need pointer_length etc?
 

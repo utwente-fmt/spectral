@@ -30,15 +30,14 @@ namespace sourcespec2ir
             {RUST_SPEC_FORALLS, ForallSep},
             {RUST_SPEC_OLD, Old},
             {RUST_SPEC_RESULT, Result}, 
-            {RUST_SPEC_BV, BoundVar}
-            //{"_old<", Old},
-            //{"_bv<", BoundVar},
+            {RUST_SPEC_BV, BoundVar}, 
+            {RUST_SPEC_FRAC_OF, FracOf}, 
+            {RUST_SPEC_PERM, Perm}
             //{"_seqNew<", SeqNew},
             //{"_seqSize<", SeqSize},
             //{"_seqGet<", SeqGet},
             //{"_seqPrepend<", SeqPrepend},
             //{"_seqEquals<", SeqEquals},
-            //{"_Perm<", Perm},
             //{"_ptrBlockLength<", PtrBlockLength},
             //{"_ptrBlockOffset<", PtrBlockOffset},
             //{"_ptrLength<", PtrLength}

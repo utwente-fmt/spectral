@@ -38,7 +38,6 @@ namespace sourcespec2ir
         return std::nullopt;
     }
 
-
     llvm::Type *RustSpecUnifier::getContentTypeOfADTTy(const llvm::Type &t)
     {
         // TODO: Implement similar to C++
@@ -53,8 +52,7 @@ namespace sourcespec2ir
 
     llvm::Type *RustSpecUnifier::getSrcLibFracType()
     {
-        // TODO: Implement similar to C++
-        return nullptr;
+        return llvm::StructType::getTypeByName(*irContext, RUST_SPEC_FRAC_TYPE);
     }
 
     llvm::CallInst *RustSpecUnifier::transformBoundVar(llvm::CallInst &oldCall)
