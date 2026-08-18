@@ -34,18 +34,16 @@ namespace sourcespec2ir
 
     protected:
         // Overwritten methods to customize the default-WrapperGenerator
-        // TODO: Check which of these are needed.
-        /*
-        std::string addConst(const std::string &baseType) override;
-        std::string addPointer(const std::string &baseType) override;
-        std::string addReference(const std::string &baseType) override;
-        std::string addTypedef(const std::string &baseType,
-                               const std::string &typedefName) override;
-        */
+
         void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;
 
-        std::string addNamespace(const std::string &parentNamespace,
-                                 const std::string &childNamespace) override;
+        /*
+        We override the default-framework for constructing the src-level types 
+        Because the Dbg-info of Rust already contains therepresentation as a 
+        string and because e.g. Rust's references do not map directly to the 
+        use DW_Tags.
+        */
+        SrcTypeRepresentation getSrcReprOfType(const llvm::DIType *type) override;
 
         std::string buildArgStr(const SrcTypeRepresentation &type,
                                 const std::string &name) override;

@@ -127,11 +127,24 @@ namespace sourcespec2ir
         }
     }
 
-    std::string RustWrapperGenerator::addNamespace(
-        const std::string &parentNamespace, const std::string &childNamespace)
+    SrcTypeRepresentation RustWrapperGenerator::getSrcReprOfType(
+        const llvm::DIType *type)
     {
-        // Ignore namespaces for now
-        return parentNamespace;
+        if (type == nullptr)
+        {
+            throw utils::PallasException(
+            "Unable to get src-representation of type (null)");
+        }
+
+        auto typeName = type->getName();
+
+        if (typeName.empty()) {
+            throw utils::PallasException(
+                "Unable to get src-representation of type (Name is empty)");
+        }
+
+        return SrcTypeRepresentation(typeName.str());
     }
+
 
 }
