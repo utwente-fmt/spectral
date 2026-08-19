@@ -1,3 +1,15 @@
+/*
+ * In the specification library we use `extern "C"` to force the specification 
+ * functions to use the C calling convention. 
+ * This simplifies the unification stage and ensures that the byval-attribute is 
+ * present which helps with type-inference.
+ * 
+ * This is fine to use in this case, because the functions of the specification
+ * library are only ever called from within the generated wrapper functions and
+ * never e.g. from C-code. So even if types that are not FFI-safe are used, this
+ * is not a problem.
+ */
+
 
 /*
  *  Simple operators
@@ -96,16 +108,16 @@ pub struct _Seq<T> {
 
 impl<T> _Seq<T> {
     #[inline(never)]
-    pub fn new() -> _Seq<T> { unimplemented!(); }
+    pub extern "C" fn new() -> _Seq<T> { unimplemented!(); }
 
      #[inline(never)]
-    pub fn size(self) -> i64 { unimplemented!(); }
+    pub extern "C" fn size(self) -> i64 { unimplemented!(); }
 
      #[inline(never)]
     pub extern "C" fn at(self, _idx: i64) -> T { unimplemented!(); }
 
     #[inline(never)]
-    pub fn prepend(self, _elem: T) -> _Seq<T> { unimplemented!(); }
+    pub extern "C" fn prepend(self, _elem: T) -> _Seq<T> { unimplemented!(); }
 
     // TODO: Instead, use #[derive(PartialEq)] ?!
     #[inline(never)]
@@ -115,7 +127,7 @@ impl<T> _Seq<T> {
     pub extern "C" fn set(self, _idx: i64, _elem: T) -> _Seq<T> { unimplemented!(); }
     
     #[inline(never)]
-    pub fn slice(self, _from: i64, _to: i64) -> _Seq<T> { unimplemented!(); }
+    pub extern "C" fn slice(self, _from: i64, _to: i64) -> _Seq<T> { unimplemented!(); }
 
 }
 

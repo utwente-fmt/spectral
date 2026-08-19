@@ -319,7 +319,7 @@ namespace sourcespec2ir
         auto numArgs = oldCall.arg_size();
 
         // Obtain the content-type from the sequence that is passed as the first arg.
-        auto cType = getContentTypeOfADT(oldCall, numArgs - 1);
+        auto cType = getContentTypeOfADT(oldCall, 0);
         auto seqType = getUSpecSeqType(cType);
 
         // Copy types and arguments of the passed element's representation.
@@ -438,7 +438,7 @@ namespace sourcespec2ir
                 return getContentTypeOfADTTy(*arg->getParamStructRetType());
         }
         throw utils::PallasException(
-        "Failed to extract the content-type of the the ADT."
+        "Failed to extract the content-type of the the ADT. "
         "Call-attributes and arg-value were insuffucient.");
     }
 

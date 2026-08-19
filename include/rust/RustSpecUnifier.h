@@ -33,15 +33,14 @@ namespace sourcespec2ir
             {RUST_SPEC_BV, BoundVar}, 
             {RUST_SPEC_FRAC_OF, FracOf}, 
             {RUST_SPEC_PERM, Perm}, 
-            {RUST_SPEC_UNFOLDING, Unfolding}
-            //{"_seqNew<", SeqNew},
-            //{"_seqSize<", SeqSize},
-            //{"_seqGet<", SeqGet},
-            //{"_seqPrepend<", SeqPrepend},
-            //{"_seqEquals<", SeqEquals},
-            //{"_ptrBlockLength<", PtrBlockLength},
-            //{"_ptrBlockOffset<", PtrBlockOffset},
-            //{"_ptrLength<", PtrLength}
+            {RUST_SPEC_UNFOLDING, Unfolding},
+            {RUST_SPEC_SEQ_NEW, SeqNew},
+            {RUST_SPEC_SEQ_EQ, SeqEquals}, 
+            {RUST_SPEC_SEQ_SIZE, SeqSize},
+            {RUST_SPEC_SEQ_AT, SeqGet}, 
+            {RUST_SPEC_SEQ_PREPEND, SeqPrepend},
+            {RUST_SPEC_SEQ_SET, SeqSet}, 
+            {RUST_SPEC_SEQ_SLICE, SeqSlice}
         };
 
         RustSpecUnifier(const bool printDebugInfo);
@@ -57,6 +56,8 @@ namespace sourcespec2ir
         llvm::Type *getSrcLibFracType() override;
 
         llvm::CallInst *transformBoundVar(llvm::CallInst &oldCall) override;
+
+        llvm::CallInst *transformSeqPrepend(llvm::CallInst &oldCall) override;
     };
 
 }

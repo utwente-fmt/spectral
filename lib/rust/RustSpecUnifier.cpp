@@ -23,7 +23,7 @@ namespace sourcespec2ir
 
         auto fName = f.getName().str();
         auto nameDemangle = llvm::demangle(fName);
-        // llvm::outs() << "Demangle " << fName << " --> " << nameDemangle << "\n";
+        llvm::outs() << "Demangle " << fName << " --> " << nameDemangle << "\n";
 
         // Check if the name starts with the spec-namespace:
         auto nameCrop = llvm::StringRef(nameDemangle);
@@ -40,14 +40,16 @@ namespace sourcespec2ir
 
     llvm::Type *RustSpecUnifier::getContentTypeOfADTTy(const llvm::Type &t)
     {
-        // TODO: Implement similar to C++
-        return nullptr;
+        if (auto *adtType = llvm::dyn_cast<llvm::StructType>(&t))
+        {
+            return adtType->getElementType(0);
+        }
+        throw utils::PallasException("Failed to extract the content-type of the ADT.");
     }
 
     bool RustSpecUnifier::isSrcSeqType(const llvm::StructType &t)
     {
-        // TODO: Implement similar to C++
-        return false;
+        return t.getName().startswith(RUST_SPEC_SEQ_TYPE);
     }
 
     llvm::Type *RustSpecUnifier::getSrcLibFracType()
@@ -99,6 +101,46 @@ namespace sourcespec2ir
         auto newCall = llvm::CallInst::Create(
             getUSpecBoundVar(*retRepr), newArgs);
         applyAttrToReturn(*retRepr, newCall);
+        return newCall;
+    }
+
+    llvm::CallInst *RustSpecUnifier::transformSeqPrepend(llvm::CallInst &oldCall)
+    {
+        // Needs custom unification because the arguments are in a
+        // different order!
+        auto numArgs = oldCall.arg_size();
+
+        // Get content-typ from sret-arg
+        auto cType = getContentTypeOfADT(oldCall, 0);
+        auto seqType = getUSpecSeqType(cType);
+
+        // Copy types and arguments of the passed element's representation.
+        // RUST:    sret-ptr, self-ptr,     <<ELEM-REPR>>
+        // TARGET:  sret-ptr, <<ELEM-REPR>>, self-ptr
+        auto elemTRepr = IRTypeRepresentation::getArgReprFromCall(
+            oldCall, 2, numArgs - 2);
+
+        // Build arg-list (reordering)
+        llvm::SmallVector<llvm::Value *> newArgs;
+        // Sret-arg
+        newArgs.push_back(oldCall.getArgOperand(0));
+        // Elem-repr
+        for (unsigned i = 2; i < numArgs; ++i)
+            newArgs.push_back(oldCall.getArgOperand(i));
+        // Seq-ptr
+        newArgs.push_back(oldCall.getArgOperand(1));
+
+        auto newCall = llvm::CallInst::Create(
+            getUSpecSeqPrepend(cType, *elemTRepr), newArgs);
+
+        // Add attributes to return-type
+        addSret(newCall, 0, seqType);
+        // Add Attributes to representation of the prepended element
+        applyAttrToParamRepr(*elemTRepr, newCall, 1);
+        // Add attributes for the passed-in sequence
+        newCall->addParamAttr(numArgs - 1, llvm::Attribute::NoUndef);
+        addByVal(newCall, numArgs - 1, seqType);
+
         return newCall;
     }
 

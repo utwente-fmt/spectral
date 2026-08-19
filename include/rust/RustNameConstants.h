@@ -27,8 +27,16 @@ namespace sourcespec2ir
     const std::string RUST_SPEC_FRAC_OF = "Frac::of";
     const std::string RUST_SPEC_PERM = "_Perm";
     const std::string RUST_SPEC_UNFOLDING = "_unfolding";
+    const std::string RUST_SPEC_SEQ_NEW = "_Seq$LT$T$GT$::new";
+    const std::string RUST_SPEC_SEQ_EQ = "_Seq$LT$T$GT$::eq";
+    const std::string RUST_SPEC_SEQ_SIZE = "_Seq$LT$T$GT$::size";
+    const std::string RUST_SPEC_SEQ_AT = "_Seq$LT$T$GT$::at";
+    const std::string RUST_SPEC_SEQ_PREPEND = "_Seq$LT$T$GT$::prepend"; 
+    const std::string RUST_SPEC_SEQ_SET = "_Seq$LT$T$GT$::set"; 
+    const std::string RUST_SPEC_SEQ_SLICE = "_Seq$LT$T$GT$::slice";
 
     const std::string RUST_SPEC_FRAC_TYPE = "rust_spec::Frac";
+    const std::string RUST_SPEC_SEQ_TYPE = "rust_spec::_Seq<";
 }
 
 #endif // PALLAS_RUSTNAMECONSTANTS_H

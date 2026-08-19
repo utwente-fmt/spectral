@@ -43,6 +43,7 @@ namespace sourcespec2ir
         call << " -C opt-level=0";
         call << " --crate-type lib ";
         call << " --edition=2021 ";
+        // call << " -C debug-assertions=false ";
         // Disable overflow-checks with '-C debug-assertions=false' ?!
         // TODO: Do we want to set panic = "abort" ???
         // TODO: Check if MIR optimizations also have to be disabled

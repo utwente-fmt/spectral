@@ -196,8 +196,7 @@ namespace sourcespec2ir
         auto isParamReturn = oldCall.getCalledFunction()->getReturnType()->isVoidTy();
 
         // Get the content-type of the sequence from the argument
-        auto cType = getContentTypeOfADT(
-            *oldCall.getArgOperand(isParamReturn ? 2 : 1));
+        auto cType = getContentTypeOfADT(oldCall, isParamReturn ? 2 : 1);
 
         // Build type-representation of the return-type
         IRTypeRepresentation retTRepr;
