@@ -25,7 +25,7 @@ namespace sourcespec2ir
             const llvm::SmallVector<SpecDeclaration> &specDeclarations,
             const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers) override;
 
-        // TODO: Check if virtual std::unique_ptr<SourceSyntaxResolver> createSyntaxResolver(); need to be changed!
+            std::unique_ptr<SourceSyntaxResolver> createSyntaxResolver() override;
     };
 
 }

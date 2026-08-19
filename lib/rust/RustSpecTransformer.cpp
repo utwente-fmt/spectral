@@ -1,6 +1,7 @@
 #include "RustCompilerDriver.h"
 #include "RustSpecUnifier.h"
 #include "RustSpecTransformer.h"
+#include "RustSyntaxResolver.h"
 #include "RustWrapperGenerator.h"
 
 namespace sourcespec2ir
@@ -28,5 +29,11 @@ namespace sourcespec2ir
         return std::make_unique<RustWrapperGenerator>(
             getSrcInPath(), specDeclarations, wrapperMarkers, 
             createSyntaxResolver());
+    }
+
+    std::unique_ptr<SourceSyntaxResolver>
+    RustSpecTransformer::createSyntaxResolver()
+    {
+        return std::make_unique<RustSyntaxResolver>();
     }
 }

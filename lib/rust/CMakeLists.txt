@@ -3,6 +3,7 @@ add_library(spec2ir_Rust STATIC
     RustCompilerDriver.cpp
     RustSpecTransformer.cpp
     RustSpecUnifier.cpp
+    RustSyntaxResolver.cpp
     RustWrapperGenerator.cpp
 )
          

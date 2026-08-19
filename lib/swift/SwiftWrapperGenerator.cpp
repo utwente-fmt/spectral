@@ -2,7 +2,6 @@
 #include "PallasException.h"
 #include "SrcLookup.h"
 #include "SwiftNameConstants.h"
-#include "SwiftSyntaxResolver.h"
 
 #include <sstream>
 #include <regex>
