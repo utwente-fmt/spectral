@@ -75,12 +75,20 @@ impl Frac {
     pub fn of(_num: i32, _denom: i32) -> Frac { unimplemented!(); } 
 }
 
-// We make this an 'extern "C"' to simplify the unification-stage!
+// TODO: We might want to add specialized verison to carry information like 
+//       mutability further. 
 #[inline(never)]
 #[allow(non_snake_case)]
 pub extern "C" fn _Perm<T>(_loc: &T, _p: Frac) -> bool { unimplemented!(); }
 
-// TODO: Do we need pointer_length etc?
+#[inline(never)]
+pub fn _ptr_length<T>(_ptr: *const T) -> i64 { unimplemented!(); }
+
+#[inline(never)]
+pub fn _ptr_block_offset<T>(_ptr: *const T) -> i64 { unimplemented!(); }
+
+#[inline(never)]
+pub fn _ptr_block_length<T>(_ptr: *const T) -> i64 { unimplemented!(); }
 
 /* 
  *  Predicates
@@ -130,5 +138,3 @@ impl<T> _Seq<T> {
     pub extern "C" fn slice(self, _from: i64, _to: i64) -> _Seq<T> { unimplemented!(); }
 
 }
-
-// TODO: Implement the full spec-lib

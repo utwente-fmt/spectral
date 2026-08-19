@@ -128,17 +128,28 @@ namespace sourcespec2ir
         }
     }
 
+    namespace {
+        void prependStr(llvm::SmallString<16U> &str, std::string prefix) {
+            llvm::StringRef sr(prefix);
+            str.insert(str.begin(), sr.begin(), sr.end());
+        } 
+    }
+
     void RustWrapperGenerator::addPointer(
         SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
-        if (type.getName().starts_with("&mut")) {
-            // Prepend '&mut '
-            llvm::StringRef r = "&mut ";
-            baseType.prefix.insert(baseType.prefix.begin(), r.begin(), r.end());
-        } else if (type.getName().starts_with("&")) {
-            // Prepend '& '
-            llvm::StringRef r = "& ";
-            baseType.prefix.insert(baseType.prefix.begin(), r.begin(), r.end());
+        // The different types of references and pointers cannot be 
+        // differentiated based on the DW_Tag alone. Hence, we need to look 
+        // at the prefix of the name instead.
+        auto tName = type.getName();
+        if (tName.starts_with("&mut")) {
+            prependStr(baseType.prefix, "&mut ");
+        } else if (tName.starts_with("&")) {
+            prependStr(baseType.prefix, "& ");
+        } else if (tName.starts_with("*const")) {
+            prependStr(baseType.prefix, "*const ");
+        } else if (tName.starts_with("*mut")) {
+            prependStr(baseType.prefix, "*mut ");
         } else {
             throw utils::PallasException(
                 "Encountered an unsupported DW_TAG_pointer_type.");

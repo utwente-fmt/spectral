@@ -40,7 +40,10 @@ namespace sourcespec2ir
             {RUST_SPEC_SEQ_AT, SeqGet}, 
             {RUST_SPEC_SEQ_PREPEND, SeqPrepend},
             {RUST_SPEC_SEQ_SET, SeqSet}, 
-            {RUST_SPEC_SEQ_SLICE, SeqSlice}
+            {RUST_SPEC_SEQ_SLICE, SeqSlice}, 
+            {RUST_SPEC_PTR_BLOCK_LENGTH, PtrBlockLength},
+            {RUST_SPEC_PTR_BLOCK_OFFSET, PtrBlockOffset},
+            {RUST_SPEC_PTR_LENGTH, PtrLength}
         };
 
         RustSpecUnifier(const bool printDebugInfo);

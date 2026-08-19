@@ -34,6 +34,9 @@ namespace sourcespec2ir
     const std::string RUST_SPEC_SEQ_PREPEND = "_Seq$LT$T$GT$::prepend"; 
     const std::string RUST_SPEC_SEQ_SET = "_Seq$LT$T$GT$::set"; 
     const std::string RUST_SPEC_SEQ_SLICE = "_Seq$LT$T$GT$::slice";
+    const std::string RUST_SPEC_PTR_BLOCK_LENGTH = "_ptr_block_length";
+    const std::string RUST_SPEC_PTR_BLOCK_OFFSET = "_ptr_block_offset";
+    const std::string RUST_SPEC_PTR_LENGTH = "_ptr_length";
 
     const std::string RUST_SPEC_FRAC_TYPE = "rust_spec::Frac";
     const std::string RUST_SPEC_SEQ_TYPE = "rust_spec::_Seq<";
