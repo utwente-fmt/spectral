@@ -8,10 +8,10 @@ namespace sourcespec2ir
     CppWrapperGenerator::CppWrapperGenerator(
         const std::string srcInFile,
         const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations,
-        const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers, 
+        const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
         std::unique_ptr<SourceSyntaxResolver> syntaxResolver)
         : SourceWrapperGenerator(
-            srcInFile, specDeclarations, wrapperMarkers, std::move(syntaxResolver))
+              srcInFile, specDeclarations, wrapperMarkers, std::move(syntaxResolver))
     {
     }
 
@@ -95,25 +95,28 @@ namespace sourcespec2ir
         return SrcTypeRepresentation("void");
     }
 
-    void CppWrapperGenerator::addConst(SrcTypeRepresentation &baseType)
+    void CppWrapperGenerator::addConst(SrcTypeRepresentation &baseType,
+                                       const llvm::DIDerivedType &type)
     {
         baseType.prefix.append(" const ");
     }
 
-    void CppWrapperGenerator::addPointer(SrcTypeRepresentation &baseType)
+    void CppWrapperGenerator::addPointer(SrcTypeRepresentation &baseType,
+                                         const llvm::DIDerivedType &type)
     {
         baseType.prefix.append("*");
     }
 
-    void CppWrapperGenerator::addReference(SrcTypeRepresentation &baseType)
+    void CppWrapperGenerator::addReference(SrcTypeRepresentation &baseType,
+                                           const llvm::DIDerivedType &type)
     {
         baseType.prefix.append(" &");
     }
 
     void CppWrapperGenerator::addTypedef(
-        SrcTypeRepresentation &baseType, const std::string &typedefName)
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
-        baseType.prefix = typedefName;
+        baseType.prefix = type.getName().str();
         baseType.suffix = "";
     }
 

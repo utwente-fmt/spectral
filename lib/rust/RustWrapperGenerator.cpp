@@ -3,6 +3,7 @@
 #include "PallasException.h"
 #include "RustNameConstants.h"
 #include "SrcLookup.h"
+#include "FileUtils.h"
 
 #include <sstream>
 
@@ -127,24 +128,34 @@ namespace sourcespec2ir
         }
     }
 
-    SrcTypeRepresentation RustWrapperGenerator::getSrcReprOfType(
-        const llvm::DIType *type)
+    void RustWrapperGenerator::addPointer(
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
-        if (type == nullptr)
-        {
+        if (type.getName().starts_with("&mut")) {
+            // Prepend '&mut '
+            llvm::StringRef r = "&mut ";
+            baseType.prefix.insert(baseType.prefix.begin(), r.begin(), r.end());
+        } else if (type.getName().starts_with("&")) {
+            // Prepend '& '
+            llvm::StringRef r = "& ";
+            baseType.prefix.insert(baseType.prefix.begin(), r.begin(), r.end());
+        } else {
             throw utils::PallasException(
-            "Unable to get src-representation of type (null)");
+                "Encountered an unsupported DW_TAG_pointer_type.");
         }
-
-        auto typeName = type->getName();
-
-        if (typeName.empty()) {
-            throw utils::PallasException(
-                "Unable to get src-representation of type (Name is empty)");
-        }
-
-        return SrcTypeRepresentation(typeName.str());
     }
 
+    std::string RustWrapperGenerator::addNamespace(
+        const std::string &parentNamespace, const std::string &childNamespace)
+    {
+        // In some cases, the name of the current file is added to the namespace
+        // This case needs to be skipped. 
+        auto filename = utils::filenameWithoutExtension(srcInFile);
+        if (parentNamespace.empty() && childNamespace == filename) {
+            return "";
+        }
+
+        return parentNamespace + childNamespace + "::";
+    }
 
 }

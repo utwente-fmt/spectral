@@ -37,16 +37,14 @@ namespace sourcespec2ir
 
         void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;
 
-        /*
-        We override the default-framework for constructing the src-level types 
-        Because the Dbg-info of Rust already contains therepresentation as a 
-        string and because e.g. Rust's references do not map directly to the 
-        use DW_Tags.
-        */
-        SrcTypeRepresentation getSrcReprOfType(const llvm::DIType *type) override;
-
         std::string buildArgStr(const SrcTypeRepresentation &type,
                                 const std::string &name) override;
+
+        void addPointer(SrcTypeRepresentation &baseType,
+                        const llvm::DIDerivedType &type) override;
+
+        std::string addNamespace(const std::string &parentNamespace,
+                                 const std::string &childNamespace) override;
 
     private:
         int wrapperCnt = 0;

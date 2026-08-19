@@ -492,13 +492,13 @@ namespace sourcespec2ir
             auto tRepr = getSrcReprOfType(baseType);
 
             if (tag == llvm::dwarf::DW_TAG_pointer_type)
-                addPointer(tRepr);
+                addPointer(tRepr, *dType);
             else if (tag == llvm::dwarf::DW_TAG_const_type)
-                addConst(tRepr);
+                addConst(tRepr, *dType);
             else if (tag == llvm::dwarf::DW_TAG_reference_type)
-                addReference(tRepr);
+                addReference(tRepr, *dType);
             else if (tag == llvm::dwarf::DW_TAG_typedef)
-                addTypedef(tRepr, dType->getName().str());
+                addTypedef(tRepr, *dType);
             else
                 addOtherQualifier(tRepr, *dType);
 
@@ -647,7 +647,7 @@ namespace sourcespec2ir
     }
 
     void SourceWrapperGenerator::addConst(
-        SrcTypeRepresentation &baseType)
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
         // Override this to support const.
         throw utils::PallasException(
@@ -655,7 +655,7 @@ namespace sourcespec2ir
     }
 
     void SourceWrapperGenerator::addPointer(
-        SrcTypeRepresentation &baseType)
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
         // Override this to support pointers.
         throw utils::PallasException(
@@ -663,7 +663,7 @@ namespace sourcespec2ir
     }
 
     void SourceWrapperGenerator::addReference(
-        SrcTypeRepresentation &baseType)
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
         // Override this to support references.
         throw utils::PallasException(
@@ -671,7 +671,7 @@ namespace sourcespec2ir
     }
 
     void SourceWrapperGenerator::addTypedef(
-        SrcTypeRepresentation &baseType, const std::string &typedefName)
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
         // Override this to support typedefs.
         throw utils::PallasException(
