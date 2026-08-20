@@ -80,7 +80,7 @@ In general it is advisable, to place the function contract on a separate line ab
 Loop invariants are written within specification comments using the following grammar (where `EXPR` is an expression from the source language that does not contain `;`):
 ```
 LOOP_INV   ::= '/*@' INV_CLAUSE+ '@*/'
-INV_CLAUSE ::= 'loop-invariant' EXPR ';'
+INV_CLAUSE ::= 'loop_invariant' EXPR ';'
 ```
 
 Loop invariants are matched to the first loop in the LLVM-IR below their definition and must be placed before the loop header in the source file. 

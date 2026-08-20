@@ -384,7 +384,11 @@ namespace sourcespec2ir
             {
                 auto *srcVar = intrinsic->getVariable();
                 // Filter on function arguments
-                if (srcVar->getArg() != 0)
+                // TODO: If checking for the inlinedAt is not sufficient, we can 
+                // check the DIFunction that the DIVariable is defined in
+                bool isInlined = intrinsic->getDebugLoc() &&
+                                 intrinsic->getDebugLoc().getInlinedAt() != nullptr;
+                if (srcVar->getArg() != 0 && !isInlined)
                     varSet->insert(srcVar);
             }
         }
