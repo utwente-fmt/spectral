@@ -191,7 +191,6 @@ namespace sourcespec2ir
         // TODO: Is this strictly nessessary? Based on the above algorithm,
         // there should never be an instruction between contract and matched
         // function.
-        // auto fLine = getSProgForFunc(*closestFunction)->getLine();
         for (auto &f : irModule->getFunctionList())
         {
             // Skip artificial functions
@@ -203,12 +202,13 @@ namespace sourcespec2ir
             {
                 auto dbgLoc = it->getDebugLoc();
                 // Skip check if no dbg-info is present
+                // TODO: Check if the dbg-location refers to the same file!
                 if (!dbgLoc)
                     continue;
                 const auto iLine = dbgLoc.getLine();
-                auto isDebugIntrinsic = llvm::isa<llvm::DbgVariableIntrinsic>(&*it);
                 if (iLine >= endLine && iLine < closestLine)
                 {
+                    it->dump();
                     throw utils::PallasException(
                         "Encountered an instruction between contract and function.");
                 }

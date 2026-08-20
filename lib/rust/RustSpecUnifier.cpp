@@ -23,7 +23,7 @@ namespace sourcespec2ir
 
         auto fName = f.getName().str();
         auto nameDemangle = llvm::demangle(fName);
-        llvm::outs() << "Demangle " << fName << " --> " << nameDemangle << "\n";
+        // llvm::outs() << "Demangle " << fName << " --> " << nameDemangle << "\n";
 
         // Check if the name starts with the spec-namespace:
         auto nameCrop = llvm::StringRef(nameDemangle);
