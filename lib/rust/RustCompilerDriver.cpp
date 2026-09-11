@@ -40,10 +40,11 @@ namespace sourcespec2ir
         call << " rustc ";
         call << " --emit=llvm-ir ";
         call << " -g ";
-        call << " -C opt-level=0";
+        call << " -C opt-level=0"; // setting this to 1 seems to make the dbg0info simpler?!
+        // call << " -Zmir-opt-level=0 ";
         call << " --crate-type lib ";
         call << " --edition=2021 ";
-        // call << " -C debug-assertions=false ";
+        call << " -C debug-assertions=false ";
         // Disable overflow-checks with '-C debug-assertions=false' ?!
         // TODO: Do we want to set panic = "abort" ???
         // TODO: Check if MIR optimizations also have to be disabled
