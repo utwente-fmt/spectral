@@ -31,21 +31,4 @@ namespace sourcespec2ir
         return n.trim().str();
     }
 
-    llvm::SmallVector<std::string> RustSyntaxResolver::getGhostMethodArgs(
-        llvm::StringRef impl)
-    {
-        auto plainArgs = SourceSyntaxResolver::getGhostMethodArgs(impl);
-        llvm::SmallVector<std::string> res;
-
-        // Add a reference to all arg-types
-        for (auto &argStr: plainArgs) {
-            auto n = getArgName(argStr);
-            auto t = getTypeForGhostArgDef(argStr);
-            auto newArgStr = n + ": &" + t.prefix.str().str();
-            res.push_back(newArgStr);
-        }
-
-        return res;
-    }
-
 }

@@ -81,10 +81,9 @@ namespace sourcespec2ir
         bool first = true;
         for (auto arg : argVec)
         {
-            auto [name, type] = arg.split(':');
             if (!first)
                 stream << ", ";
-            stream << name.str() << ": &" << type.str();
+            stream << arg.str();
             first = false;
         }
 
@@ -113,7 +112,8 @@ namespace sourcespec2ir
         if (!type.suffix.empty())
             throw utils::PallasException(
                 "Unexpected suffix in type representation");
-        return name + ": &" + type.prefix.str().str();
+        // return name + ": &" + type.prefix.str().str();
+        return name + ": " + type.prefix.str().str();
     }
 
     void RustWrapperGenerator::modifySrcWithWrappers(std::list<SrcLine> &srcLines)

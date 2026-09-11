@@ -18,10 +18,6 @@ namespace sourcespec2ir
             llvm::StringRef argDef) override;
 
         std::string getArgName(llvm::StringRef argDef) override;
-
-        // Adds '&' in front of the types
-        llvm::SmallVector<std::string> getGhostMethodArgs(
-            llvm::StringRef impl) override;
     };
 
 }
