@@ -2,7 +2,6 @@
 #include "PallasException.h"
 #include "SrcLookup.h"
 #include "SwiftNameConstants.h"
-#include "SwiftSyntaxResolver.h"
 
 #include <sstream>
 #include <regex>
@@ -22,7 +21,7 @@ namespace sourcespec2ir
         const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
         std::unique_ptr<SourceSyntaxResolver> syntaxResolver)
         : SourceWrapperGenerator(
-              srcInFile, specDeclarations, wrapperMarkers, 
+              srcInFile, specDeclarations, wrapperMarkers,
               std::move(syntaxResolver)),
           demangler()
     {
@@ -129,14 +128,15 @@ namespace sourcespec2ir
         return std::make_pair(1, 7);
     }
 
-    void SwiftWrapperGenerator::addConst(SrcTypeRepresentation &baseType)
+    void SwiftWrapperGenerator::addConst(SrcTypeRepresentation &baseType,
+                                         const llvm::DIDerivedType &type)
     {
         // In swift, function-arguments are const by default
         return;
     }
 
     void SwiftWrapperGenerator::addTypedef(
-        SrcTypeRepresentation &baseType, const std::string &typedefName)
+        SrcTypeRepresentation &baseType, const llvm::DIDerivedType &type)
     {
         return;
     }

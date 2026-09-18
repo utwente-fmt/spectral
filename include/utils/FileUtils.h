@@ -25,6 +25,11 @@ namespace sourcespec2ir
          * Calculates an md5 checksum for the file at the given path.
          */
         std::string getChecksumForFile(const std::string &path);
+
+        /**
+         * Given a path, return the filename without the file extension.
+         */
+        std::string filenameWithoutExtension(const std::string &path);
     }
 
 }

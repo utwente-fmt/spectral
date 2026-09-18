@@ -51,4 +51,9 @@ namespace sourcespec2ir::utils
                 "Failed to get checksum for file at: " + path);
         return md5Res.get().digest().str().str();
     }
+
+    std::string filenameWithoutExtension(const std::string &path) {
+        auto name = llvm::sys::path::stem(llvm::sys::path::filename(path));
+        return name.str();
+    }
 }

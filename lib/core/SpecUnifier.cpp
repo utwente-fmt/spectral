@@ -261,7 +261,7 @@ namespace sourcespec2ir
 
     llvm::CallInst *SpecUnifier::transformSeqNew(llvm::CallInst &oldCall)
     {
-        auto cType = getContentTypeOfADT(*oldCall.getArgOperand(0));
+        auto cType = getContentTypeOfADT(oldCall, 0);
         llvm::SmallVector<llvm::Value *, 1> newArgs = {oldCall.getArgOperand(0)};
         auto newCall = llvm::CallInst::Create(getUSpecSeqNew(cType), newArgs);
         addSret(newCall, 0, getUSpecSeqType(cType));
@@ -270,7 +270,7 @@ namespace sourcespec2ir
 
     llvm::CallInst *SpecUnifier::transformSeqSize(llvm::CallInst &oldCall)
     {
-        auto cType = getContentTypeOfADT(*oldCall.getArgOperand(0));
+        auto cType = getContentTypeOfADT(oldCall, 0);
         llvm::SmallVector<llvm::Value *, 1> newArgs = {oldCall.getArgOperand(0)};
         auto newCall = llvm::CallInst::Create(getUSpecSeqSize(cType), newArgs);
         newCall->addParamAttr(0, llvm::Attribute::NoUndef);
@@ -289,8 +289,7 @@ namespace sourcespec2ir
         auto isParamReturn = retRepr->isReturnByParam();
 
         // Get the content-type of the sequence from the argument
-        auto cType = getContentTypeOfADT(
-            *oldCall.getArgOperand(isParamReturn ? 1 : 0));
+        auto cType = getContentTypeOfADT(oldCall, isParamReturn ? 1 : 0);
 
         // Build new arg-list by copying arguments 1:1
         llvm::SmallVector<llvm::Value *> newArgs;
@@ -320,7 +319,7 @@ namespace sourcespec2ir
         auto numArgs = oldCall.arg_size();
 
         // Obtain the content-type from the sequence that is passed as the first arg.
-        auto cType = getContentTypeOfADT(*oldCall.getArgOperand(numArgs - 1));
+        auto cType = getContentTypeOfADT(oldCall, 0);
         auto seqType = getUSpecSeqType(cType);
 
         // Copy types and arguments of the passed element's representation.
@@ -347,7 +346,7 @@ namespace sourcespec2ir
 
     llvm::CallInst *SpecUnifier::transformSeqEquals(llvm::CallInst &oldCall)
     {
-        auto cType = getContentTypeOfADT(*oldCall.getArgOperand(0));
+        auto cType = getContentTypeOfADT(oldCall, 0);
         auto seqType = getUSpecSeqType(cType);
         llvm::SmallVector<llvm::Value *> newArgs = {
             oldCall.getArgOperand(0),
@@ -363,7 +362,7 @@ namespace sourcespec2ir
 
     llvm::CallInst *SpecUnifier::transformSeqSlice(llvm::CallInst &oldCall)
     {
-        auto cType = getContentTypeOfADT(*oldCall.getArgOperand(1));
+        auto cType = getContentTypeOfADT(oldCall, 1);
         auto seqType = getUSpecSeqType(cType);
         llvm::SmallVector<llvm::Value *> newArgs = {
             oldCall.getArgOperand(0),
@@ -388,7 +387,7 @@ namespace sourcespec2ir
         auto argRepr = IRTypeRepresentation::getArgReprFromCall(oldCall, 3, numArgs - 3);
 
         // Get the content-type of the sequence from the argument
-        auto cType = getContentTypeOfADT(*oldCall.getArgOperand(1));
+        auto cType = getContentTypeOfADT(oldCall, 1);
         auto seqType = getUSpecSeqType(cType);
 
         // Build new arg-list by copying arguments 1:1
@@ -407,16 +406,29 @@ namespace sourcespec2ir
         return newCall;
     }
 
-    llvm::Type *SpecUnifier::getContentTypeOfADT(const llvm::Value &v)
+    llvm::Type *SpecUnifier::getContentTypeOfADT(
+        const llvm::CallInst &call, unsigned idx)
     {
-        // Get the content-type of the ADT from the first element of the struct
-        // Currently, only types allocated via alloca are supported.
-        // TODO: Expand this (arguments, ...)
-        if (auto *allocInstr = llvm::dyn_cast<llvm::AllocaInst>(&v))
+        // Get type from attributes on the call
+        if (auto *byT = call.getParamByValType(idx)) {
+            return getContentTypeOfADTTy(*byT);
+        } else if (auto *sretTy = call.getParamStructRetType(idx)) {
+            return getContentTypeOfADTTy(*sretTy);
+        }
+
+        // Get type from the value that is passed to the arg:
+        auto *v = call.getArgOperand(idx);
+        if (v == nullptr) {
+            throw utils::PallasException(
+                "Failed to extract the content-type of the the ADT. "
+                "Value was null!");
+        }
+
+        if (auto *allocInstr = llvm::dyn_cast<llvm::AllocaInst>(v))
         {
             return getContentTypeOfADTTy(*allocInstr->getAllocatedType());
         }
-        else if (auto *arg = llvm::dyn_cast<llvm::Argument>(&v))
+        else if (auto *arg = llvm::dyn_cast<llvm::Argument>(v))
         {
             if (arg->hasByValAttr())
                 return getContentTypeOfADTTy(*arg->getParamByValType());
@@ -425,7 +437,9 @@ namespace sourcespec2ir
             if (arg->hasStructRetAttr())
                 return getContentTypeOfADTTy(*arg->getParamStructRetType());
         }
-        throw utils::PallasException("Failed to extract the content-type of the the ADT.");
+        throw utils::PallasException(
+        "Failed to extract the content-type of the the ADT. "
+        "Call-attributes and arg-value were insuffucient.");
     }
 
     void SpecUnifier::replaceCallsToSpecFunction(llvm::Function &srcSpecFunction)

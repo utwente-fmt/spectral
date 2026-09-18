@@ -123,7 +123,11 @@ The lit-setup is based on:
 
 ## Building the Swift specification-library
 To build the specification-library for Swift, run `ninja BuildSwiftLib` in the build-directory of the project. 
-The library is build in `res/swift/PallasSpec/.build/debug/`.
+The library is build in `res/spec_libs/swift/PallasSpec/.build/debug/`.
+
+## Building the Rust specification-library
+To build the specification-library for Rust, run `ninja BuildRustLib` in the build-directory of the project. 
+The library is build in `res/spec_libs/rust/rust_spec/`.
 
 ## Licence 
 Copyright (c) 2024 - 2025 Formal Methods and Tools, University of Twente All rights reserved.

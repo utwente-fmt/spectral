@@ -175,7 +175,8 @@ namespace sourcespec2ir
          * Takes a value that represents an ADT from the source
          * specification-library and returns the content-type of this ADT.
          */
-        llvm::Type *getContentTypeOfADT(const llvm::Value &v);
+        llvm::Type *getContentTypeOfADT(
+            const llvm::CallInst &call, unsigned idx);
 
         /*
          * Functions to generate and get functions of the unified

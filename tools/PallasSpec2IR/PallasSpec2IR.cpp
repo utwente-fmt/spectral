@@ -2,6 +2,7 @@
 #include "CSpecUnifier.h"
 #include "CCompilerDriver.h"
 #include "CppSpecTransformer.h"
+#include "RustSpecTransformer.h"
 #include "SwiftSpecTransformer.h"
 #include "utils/OutputConfig.h"
 #include "utils/PallasException.h"
@@ -24,12 +25,13 @@ enum ClSourceLang
 {
     C,
     Cpp,
+    Rust,
     Swift,
     Infer
 };
 
 std::map<ClSourceLang, std::string> langNames = {
-    {C, "C"}, {Cpp, "C++"}, {Swift, "Swift"}, {Infer, "Auto"}};
+    {C, "C"}, {Cpp, "C++"}, {Swift, "Swift"}, {Rust, "Rust"}, {Infer, "Auto"}};
 
 static llvm::cl::OptionCategory SpecTransformCat(
     "Specification transformation");
@@ -74,6 +76,7 @@ static llvm::cl::opt<ClSourceLang> clLang(
     llvm::cl::values(
         clEnumVal(C, "C"),
         clEnumVal(Cpp, "C++"),
+        clEnumVal(Rust, "Rust"),
         clEnumVal(Swift, "Swift"),
         clEnumVal(Infer, "Infer source-language from file-extension")),
     llvm::cl::cat(SpecTransformCat));
@@ -115,6 +118,8 @@ int main(int argc, char **argv)
             lang = C;
         else if (inFileExt == ".cpp")
             lang = Cpp;
+        else if (inFileExt == ".rs")
+            lang = Rust;
         else if (inFileExt == ".swift")
             lang = Swift;
         else
@@ -156,6 +161,13 @@ int main(int argc, char **argv)
         else if (lang == Cpp)
         {
             sourcespec2ir::CppSpecTransformer transformer(
+                clLibPath, clInFile, clOutFile, contractFiles, config,
+                clWorkDir, clMem2Reg);
+            transformer.transformModule();
+        }
+        else if (lang == Rust)
+        {
+            sourcespec2ir::RustSpecTransformer transformer(
                 clLibPath, clInFile, clOutFile, contractFiles, config,
                 clWorkDir, clMem2Reg);
             transformer.transformModule();

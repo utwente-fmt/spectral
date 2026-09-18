@@ -267,6 +267,9 @@ namespace sourcespec2ir
         else if (path.ends_with(".swift"))
         {
             lang = llvm::dwarf::DW_LANG_Swift;
+        } else if (path.ends_with(".rs")) 
+        {
+            lang = llvm::dwarf::DW_LANG_Rust;
         }
 
         llvm::DIBuilder builder(*irModule);
@@ -850,7 +853,14 @@ namespace sourcespec2ir
         if (arg.hasSwiftSelfAttr())
             return true;
         // Check if the dbg-info has the DIFlagObjectPointer-attribute
+        // TODO: This does not work if a src-level argument is expanded 
+        //       into multiple LLVM arguments (e.g. for structs).
+        //       In that case, the indices do not match up!
         auto argIdx = arg.getArgNo();
+        // - Find intrinsic
+        // - Get DIVar
+        // - Get src-arg-idx from DIVar
+        // - Access Subroutine-typr at src-index
         auto *wSProg = arg.getParent()->getSubprogram();
         auto argDIType = wSProg->getType()->getTypeArray()[argIdx + 1];
         if (argDIType->isObjectPointer())

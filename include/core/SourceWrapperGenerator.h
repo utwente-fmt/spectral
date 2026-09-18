@@ -41,7 +41,7 @@ namespace sourcespec2ir
         SourceWrapperGenerator(
             const std::string srcInFile,
             const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations,
-            const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers, 
+            const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
             std::unique_ptr<SourceSyntaxResolver> syntaxResolver);
 
         virtual ~SourceWrapperGenerator() = default;
@@ -172,7 +172,7 @@ namespace sourcespec2ir
          * The default-implementation simply increments a counter and appends it
          * to 'PALLAS_SPEC_'.
          */
-        std::string getNameForWrapperFunction();
+        virtual std::string getNameForWrapperFunction();
 
         /**
          * Combines the generated wrapper functions and the source-representation
@@ -285,15 +285,17 @@ namespace sourcespec2ir
         /**
          * Adds a const-qualifier to the given base-type.
          */
-        virtual void addConst(SrcTypeRepresentation &baseType);
+        virtual void addConst(SrcTypeRepresentation &baseType,
+                              const llvm::DIDerivedType &type);
 
         /**
          * Adds a pointer-qualifier to the given base-type.
          */
-        virtual void addPointer(SrcTypeRepresentation &baseType);
+        virtual void addPointer(SrcTypeRepresentation &baseType,
+                                const llvm::DIDerivedType &type);
 
         /**
-         * Adds a namespace-qualifier to the string represnetation of the given
+         * Adds a namespace-qualifier to the string representation of the given
          * parent-namespace.
          */
         virtual std::string addNamespace(const std::string &parentNamespace,
@@ -304,7 +306,8 @@ namespace sourcespec2ir
          * base-type. Can be overwritten by subclasses.
          * The default-implementation simply throws an error.
          */
-        virtual void addReference(SrcTypeRepresentation &baseType);
+        virtual void addReference(SrcTypeRepresentation &baseType,
+                                  const llvm::DIDerivedType &type);
 
         /**
          * Adds a typedef qualifier to the string-representation of the given
@@ -312,7 +315,7 @@ namespace sourcespec2ir
          * The default-implementation simply throws an error.
          */
         virtual void addTypedef(SrcTypeRepresentation &baseType,
-                                const std::string &typedefName);
+                                const llvm::DIDerivedType &type);
 
         /**
          * This function is called when a different type-tag is encountered that

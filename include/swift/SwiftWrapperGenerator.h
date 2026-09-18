@@ -42,9 +42,10 @@ namespace sourcespec2ir
 
     protected:
         // Overwritten methods to customize the default-WrapperGenerator
-        void addConst(SrcTypeRepresentation &baseType) override;
+        void addConst(SrcTypeRepresentation &baseType,
+                      const llvm::DIDerivedType &type) override;
         void addTypedef(SrcTypeRepresentation &baseType,
-                        const std::string &typedefName) override;
+                        const llvm::DIDerivedType &type) override;
         void addOtherQualifier(SrcTypeRepresentation &baseType,
                                const llvm::DIDerivedType &type) override;
         void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;

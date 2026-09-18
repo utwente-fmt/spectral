@@ -10,10 +10,9 @@ namespace sourcespec2ir
         const std::string srcInFile,
         const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations,
         const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
-        std::unique_ptr<SourceSyntaxResolver> syntaxResolver 
-    )
+        std::unique_ptr<SourceSyntaxResolver> syntaxResolver)
         : SourceWrapperGenerator(
-            srcInFile, specDeclarations, wrapperMarkers, std::move(syntaxResolver))
+              srcInFile, specDeclarations, wrapperMarkers, std::move(syntaxResolver))
     {
     }
 
@@ -102,20 +101,22 @@ namespace sourcespec2ir
         return SrcTypeRepresentation("void");
     }
 
-    void CWrapperGenerator::addConst(SrcTypeRepresentation &baseType)
+    void CWrapperGenerator::addConst(SrcTypeRepresentation &baseType,
+                                     const llvm::DIDerivedType &type)
     {
         baseType.prefix.append(" const ");
     }
 
-    void CWrapperGenerator::addPointer(SrcTypeRepresentation &baseType)
+    void CWrapperGenerator::addPointer(SrcTypeRepresentation &baseType,
+                                       const llvm::DIDerivedType &type)
     {
         baseType.prefix.append("*");
     }
 
     void CWrapperGenerator::addTypedef(SrcTypeRepresentation &baseType,
-                                       const std::string &typedefName)
+                                       const llvm::DIDerivedType &type)
     {
-        baseType.prefix = typedefName;
+        baseType.prefix = type.getName().str();
         baseType.suffix = "";
     }
 

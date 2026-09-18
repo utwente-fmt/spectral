@@ -35,10 +35,12 @@ namespace sourcespec2ir
 
     protected:
         SrcTypeRepresentation getVoid() override;
-        void addConst(SrcTypeRepresentation &baseType) override;
-        void addPointer(SrcTypeRepresentation &baseType) override;
+        void addConst(SrcTypeRepresentation &baseType, 
+            const llvm::DIDerivedType &type) override;
+        void addPointer(SrcTypeRepresentation &baseType, 
+            const llvm::DIDerivedType &type) override;
         void addTypedef(SrcTypeRepresentation &baseType,
-                        const std::string &typedefName) override;
+                        const llvm::DIDerivedType &type) override;
         void addArrayDim(SrcTypeRepresentation &baseType,
                          const std::string &dimSize);
         void modifySrcWithWrappers(std::list<SrcLine> &srcLines) override;
