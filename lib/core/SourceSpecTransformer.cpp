@@ -963,7 +963,7 @@ namespace sourcespec2ir
             auto f = utils::getFunctionBySrcName(module, p.name);
             if (f == nullptr)
                 throw utils::PallasException("Failed to get predicate");
-            utils::markPredicateDef(*f, module.getContext(), p.isInline);
+            utils::markPredicateDef(*f, module.getContext(), p.isInline, p.isAbstract());
             irFunctions.push_back(f);
         }
         llvm::appendToUsed(module, irFunctions);

@@ -38,7 +38,7 @@ namespace sourcespec2ir
          * definition of a predicate.
          */
         void markPredicateDef(llvm::Function &f, llvm::LLVMContext &context, 
-            bool isInline);
+            bool isInline, bool isAbstract);
 
         /**
          * Adds a metadata-node to the function that marks it as a

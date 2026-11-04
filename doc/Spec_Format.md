@@ -132,8 +132,9 @@ Therefore this should be avoided.
 ## Predicate Definitions
 Predicates are defined in specification comments using the following syntax:
 ```
-PRED_BLOCK ::= '/*@  PRED_DEF+ @*/'
-PRED_DEF   ::= 'inline'? 'predicate' NAME '(' ARGS ')' ':=' EXPR ';'
+PRED_BLOCK   ::= '/*@  (PRED_DEF | ABS_PRED_DEF)+ @*/'
+PRED_DEF     ::= 'inline'? 'predicate' NAME '(' ARGS ')' ':=' EXPR ';'
+ABS_PRED_DEF ::= 'abstract' 'predicate' NAME '(' ARGS ')' ';'
 ```
 Where 
 - `NAME` is a character sequence that does not contain `(` and that specifies the name of the predicate. Moreover, `NAME` must be a valid function name from the used source language.
@@ -144,6 +145,8 @@ Predicate definitions are inserted into the source in the location where they ar
 Hence the location where predicates are define matters as all used types must be in scope.
 
 When the `inline` keyword is given, the predicate is treated as an inline-predicate whose definition is inlined wherever the predicate occurs.
+
+Abstract predicates `ABS_PRED_DEF` are a special case of predicates without an implementation. They can therefore be neither folded nor unfolded.
 
 ## External & Generated Contracts
 Regular contracts are attached directly to the definition of a functions.

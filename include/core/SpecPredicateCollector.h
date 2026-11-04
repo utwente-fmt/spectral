@@ -36,6 +36,8 @@ namespace sourcespec2ir
         // Overwritten visitor-methods
         std::any visitPredicateDef(
             SpecParser::PredicateDefContext *ctx) override;
+        std::any visitAbstractPredicateDef(
+            SpecParser::AbstractPredicateDefContext *ctx) override;
     };
 
 }
