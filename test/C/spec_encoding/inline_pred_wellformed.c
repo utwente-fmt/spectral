@@ -5,8 +5,8 @@
 // CHECK-DAG: define dso_local zeroext i1 @myPred(ptr noundef %0, i32 noundef %1) {{#[0-9]}} !dbg {{![0-9]+}} !pallas.predDef [[pDefMarker:![0-9]+]]
 // CHECK-DAG: define dso_local zeroext i1 @myInlinePred(ptr noundef %0, i32 noundef %1) {{#[0-9]}} !dbg {{![0-9]+}} !pallas.predDef [[pInlineDefMarker:![0-9]+]]
 
-// CHECK-DAG: [[pDefMarker]] = !{i1 false}
-// CHECK-DAG: [[pInlineDefMarker]] = !{i1 true}
+// CHECK-DAG: [[pDefMarker]] = !{i1 false, i1 false}
+// CHECK-DAG: [[pInlineDefMarker]] = !{i1 true, i1 false}
 
 
 /*@
