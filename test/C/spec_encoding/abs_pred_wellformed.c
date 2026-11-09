@@ -1,4 +1,4 @@
-// Test that abstreact predicates are encoded correctly and can be called.
+// Test that abstract predicates are encoded correctly and can be called.
 // RUN: %Spec2IR %s -lib %CSpecLib -m | %FileCheck %s
 
 /*@
