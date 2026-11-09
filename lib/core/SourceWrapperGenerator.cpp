@@ -934,6 +934,9 @@ namespace sourcespec2ir
         // Insert the predicate definitions
         for (auto &pDef : predicates)
         {
+            // TODO: If there are two predicate with an empty line in between 
+            // in the same block, the second predicate is inserted inside of the 
+            // spec-comment!
             auto body = pDef.body.has_value() 
                 ? pDef.body 
                 : getAbstractPredicateBody(pDef.name, pDef.args);

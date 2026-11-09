@@ -132,7 +132,7 @@ Therefore this should be avoided.
 ## Predicate Definitions
 Predicates are defined in specification comments using the following syntax:
 ```
-PRED_BLOCK   ::= '/*@  (PRED_DEF | ABS_PRED_DEF)+ @*/'
+PRED_BLOCK   ::= '/*@  (PRED_DEF | ABS_PRED_DEF) @*/'
 PRED_DEF     ::= 'inline'? 'predicate' NAME '(' ARGS ')' ':=' EXPR ';'
 ABS_PRED_DEF ::= 'abstract' 'predicate' NAME '(' ARGS ')' ';'
 ```

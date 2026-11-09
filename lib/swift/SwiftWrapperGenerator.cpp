@@ -22,7 +22,7 @@ namespace sourcespec2ir
         const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
         std::unique_ptr<SourceSyntaxResolver> syntaxResolver)
         : SourceWrapperGenerator(
-              srcInFile, specDeclarations, wrapperMarkers, 
+              srcInFile, specDeclarations, wrapperMarkers,
               std::move(syntaxResolver)),
           demangler()
     {
@@ -48,7 +48,7 @@ namespace sourcespec2ir
         for (auto &arg : sig.args)
         {
             // Skip 'self'-arg as it gets added implicitly
-            // Keep 'self'-arg if it was specified manually on an 
+            // Keep 'self'-arg if it was specified manually on an
             // external contract.
             if (arg.ends_with(" self") && !sig.specifiedManually)
                 continue;
@@ -86,6 +86,12 @@ namespace sourcespec2ir
           << "\n";
 
         return s.str();
+    }
+
+    std::string SwiftWrapperGenerator::getAbstractPredicateBody(
+        const std::string &name, const std::string &args)
+    {
+        return "true";
     }
 
     std::string SwiftWrapperGenerator::buildArgStr(

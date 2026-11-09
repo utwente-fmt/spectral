@@ -28,6 +28,9 @@ namespace sourcespec2ir
                                           const std::string &args,
                                           const std::string &body) override;
 
+        std::string getAbstractPredicateBody(
+            const std::string &name, const std::string &args) override;
+
         std::pair<size_t, size_t> getOffsetToExprStart(
             const SrcWrapperFunction &wFun) override;
 
