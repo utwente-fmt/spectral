@@ -98,7 +98,8 @@ namespace sourcespec2ir
          * The content does not matter, but is must be a valid expression in
          * the source language.
          */
-        virtual std::string getAbstractPredicateBody();
+        virtual std::string getAbstractPredicateBody(
+            const std::string &name, const std::string &args);
 
         /**
          * For a given SrcWrapperFunction, return the line- and column-offset

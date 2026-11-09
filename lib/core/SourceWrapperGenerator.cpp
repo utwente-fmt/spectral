@@ -936,11 +936,11 @@ namespace sourcespec2ir
         {
             auto body = pDef.body.has_value() 
                 ? pDef.body 
-                : getAbstractPredicateBody();
+                : getAbstractPredicateBody(pDef.name, pDef.args);
             auto insertPos = findInsertPos(
                 pDef.srcLoc.getStartLine(), *srcLines);
             auto strRepr = getPredicateDefString(
-                    pDef.name, pDef.args, *pDef.body);
+                    pDef.name, pDef.args, *body);
             insertLines(*srcLines, strRepr, insertPos);
         }
  
@@ -957,7 +957,8 @@ namespace sourcespec2ir
         writeSrcFile(outPath, *srcLines);
     }
 
-    std::string SourceWrapperGenerator::getAbstractPredicateBody() {
+    std::string SourceWrapperGenerator::getAbstractPredicateBody(
+        const std::string &name, const std::string &args) {
         throw new utils::PallasException(
             "Abstract predicates are not yet supported!");
     }
