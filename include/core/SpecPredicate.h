@@ -53,7 +53,7 @@ namespace sourcespec2ir
         {
         }
 
-        bool isAbstract() const { return body.has_value(); } 
+        bool isAbstract() const { return !body.has_value(); } 
     };
 }
 
