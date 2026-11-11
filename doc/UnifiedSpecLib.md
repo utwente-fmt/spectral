@@ -265,7 +265,7 @@ In this case, the implementation of the function is optional. If it is present, 
 **Source definition:**
 ```
 /*@
-predicate wPred(int *p) := _sep(p != NULL, _Perm(p, _write));
+predicate wPred(int *p) := _sep(p != NULL, _Perm(p, _writePerm));
 @*/
 ```
 
