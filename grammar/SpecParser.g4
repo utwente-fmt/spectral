@@ -29,7 +29,7 @@ specLoopInvariantBlock: SPEC_START specLoopInvariant+ SPEC_END;
 wrapperLocationMarker:
 	SPEC_START 'wrapper location' specExpression? SPEC_EXPR_END SPEC_END;
 
-predicateDefBlock: SPEC_START predicateDef+ SPEC_END;
+predicateDefBlock: SPEC_START (predicateDef | abstractPredicateDef)+ SPEC_END;
 
 ghostDefBlock: SPEC_START ghostDef SPEC_END;
 
@@ -83,6 +83,9 @@ specDeclaration: ('declare' specExpression SPEC_EXPR_END) # declarationClause;
 predicateDef:
 	INLINE? 'predicate' predName PRED_SIG_START predicateSig PRED_SIG_END ':=' specExpression
 		SPEC_EXPR_END;
+
+abstractPredicateDef:
+	'abstract' 'predicate' predName PRED_SIG_START predicateSig PRED_SIG_END SPEC_EXPR_END;
 
 ghostDef:
 	'ghost' type = ('method' | 'function') contr = ghostContract impl = ghostImpl;

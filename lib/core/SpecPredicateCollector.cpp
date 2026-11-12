@@ -53,4 +53,31 @@ namespace sourcespec2ir
 
         return 0;
     }
+
+    std::any SpecPredicateCollector::visitAbstractPredicateDef(
+        SpecParser::AbstractPredicateDefContext *ctx)
+    {
+        assert(predicates != nullptr);
+
+        auto srcLoc = utils::getLocFromCtx(ctx, file, md5Checksum);
+        // Abstract predicate does not have an expression, so we use the 
+        // end-position of the definition.
+        auto exprLoc = srcLoc.endLoc;
+        auto name = utils::getCtxAsStr(*ctx->predName());
+        auto args = utils::getCtxAsStr(*ctx->predicateSig());
+
+        predicates->push_back(
+            SpecPredicate(name, args, srcLoc, exprLoc));
+
+        if (printInfo)
+        {
+            llvm::outs() << "Found abstract predicate at "
+                         << srcLoc.getStartLine() << "::" << srcLoc.getStartCol()
+                         << " - "
+                         << srcLoc.getEndLine() << "::" << srcLoc.getEndCol()
+                         << "\n";
+        }
+
+        return 0;
+    }
 }

@@ -255,7 +255,10 @@ Here:
 
 ## Predicate definitions:
 A predicate definition is represented as regular function definition that is marked by a metadata-node with id `!pallas.predDef`.
-This node contains a boolean flag that specifies if the predicate is an inline predicate or not.
+This node is a tuple containing two boolean flags:
+- The first flag indicates if if the predicate is an inline predicate
+- The second flag indicates of the predicate should be treated as an abstract predicate (I.e. a predicate without a body that can neither be folded nor unfolded).
+In this case, the implementation of the function is optional. If it is present, the concrete body is irrelevant but can e.g. be used to infer the types of pointer-typed arguments.
 
 ### Example (C):
 
@@ -263,6 +266,12 @@ This node contains a boolean flag that specifies if the predicate is an inline p
 ```
 /*@
 predicate wPred(int *p) := _sep(p != NULL, _Perm(p, _writePerm));
+@*/
+```
+
+```
+/*@
+abstract predicate absPred(int *loc, int val);
 @*/
 ```
 

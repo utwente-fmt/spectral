@@ -93,6 +93,15 @@ namespace sourcespec2ir
                                                   const std::string &body) = 0;
 
         /**
+         * Return a string that is used as the body for constructing a wrapper 
+         * of an abstract predicate. 
+         * The content does not matter, but is must be a valid expression in
+         * the source language.
+         */
+        virtual std::string getAbstractPredicateBody(
+            const std::string &name, const std::string &args);
+
+        /**
          * For a given SrcWrapperFunction, return the line- and column-offset
          * from the start of the wrapper-function to the beginning of the
          * wrapped expression in the source.

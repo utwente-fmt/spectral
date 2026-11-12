@@ -32,12 +32,15 @@ namespace sourcespec2ir
         }
 
         void markPredicateDef(llvm::Function &f, llvm::LLVMContext &context,
-                              bool isInline)
+                              bool isInline, bool isAbstract)
         {
             auto inlineFlag = llvm::ConstantAsMetadata::get(
                 llvm::ConstantInt::getBool(context, isInline));
-            f.setMetadata(PALLAS_PREDICATE_DEF_MARKER,
-                          llvm::MDNode::get(context, inlineFlag));
+            auto abstractFlag = llvm::ConstantAsMetadata::get(
+                llvm::ConstantInt::getBool(context, isAbstract));
+            auto mdTuple = llvm::MDTuple::get(
+                context, {inlineFlag, abstractFlag});
+            f.setMetadata(PALLAS_PREDICATE_DEF_MARKER, mdTuple);
         }
 
         bool isPredicateDef(const llvm::Function &f)

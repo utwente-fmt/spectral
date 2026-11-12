@@ -38,6 +38,7 @@ METHOD: 'method';
 FUNCTION: 'function';
 EQUALS: '=';
 ASSIGN: 'assign';
+ABSTRACT: 'abstract';
 
 
 PRED_SIG_START: '(';

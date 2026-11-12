@@ -934,12 +934,19 @@ namespace sourcespec2ir
         // Insert the predicate definitions
         for (auto &pDef : predicates)
         {
+            // TODO: If there are two predicate with an empty line in between 
+            // in the same block, the second predicate is inserted inside of the 
+            // spec-comment!
+            auto body = pDef.body.has_value() 
+                ? pDef.body 
+                : getAbstractPredicateBody(pDef.name, pDef.args);
+            auto insertPos = findInsertPos(
+                pDef.srcLoc.getStartLine(), *srcLines);
             auto strRepr = getPredicateDefString(
-                pDef.name, pDef.args, pDef.body);
-            auto insertPos = findInsertPos(pDef.srcLoc.getStartLine(), *srcLines);
+                    pDef.name, pDef.args, *body);
             insertLines(*srcLines, strRepr, insertPos);
         }
-
+ 
         for (auto &ghost : ghostMethods)
         {
             auto pos = findInsertPos(ghost->srcLoc.getStartLine(), *srcLines);
@@ -951,6 +958,12 @@ namespace sourcespec2ir
 
         // Write modified file
         writeSrcFile(outPath, *srcLines);
+    }
+
+    std::string SourceWrapperGenerator::getAbstractPredicateBody(
+        const std::string &name, const std::string &args) {
+        throw new utils::PallasException(
+            "Abstract predicates are not yet supported!");
     }
 
     std::unique_ptr<std::list<SourceWrapperGenerator::SrcLine>>

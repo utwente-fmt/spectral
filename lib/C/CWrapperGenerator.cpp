@@ -10,10 +10,9 @@ namespace sourcespec2ir
         const std::string srcInFile,
         const llvm::ArrayRef<sourcespec2ir::SpecDeclaration> specDeclarations,
         const llvm::ArrayRef<sourcespec2ir::WrapperLocMarker> wrapperMarkers,
-        std::unique_ptr<SourceSyntaxResolver> syntaxResolver 
-    )
+        std::unique_ptr<SourceSyntaxResolver> syntaxResolver)
         : SourceWrapperGenerator(
-            srcInFile, specDeclarations, wrapperMarkers, std::move(syntaxResolver))
+              srcInFile, specDeclarations, wrapperMarkers, std::move(syntaxResolver))
     {
     }
 
@@ -83,6 +82,12 @@ namespace sourcespec2ir
         s << "#pragma clang diagnostic pop \n";
 
         return s.str();
+    }
+
+    std::string CWrapperGenerator::getAbstractPredicateBody(
+        const std::string &name, const std::string &args)
+    {
+        return "1";
     }
 
     std::pair<size_t, size_t> CWrapperGenerator::getOffsetToExprStart(
