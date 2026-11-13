@@ -38,19 +38,25 @@ RUN apt-get -q install -y \
         unzip \
         zlib1g-dev \ 
         curl
-ENV SWIFT_SIGNING_KEY=52BB7E3DE28A71BE22EC05FFEF80A866B47A981F
-ENV SWIFT_URL=https://download.swift.org/swift-6.0.1-release/ubuntu2404/swift-6.0.1-RELEASE/swift-6.0.1-RELEASE-ubuntu24.04.tar.gz
-ENV SWIFT_SIG_URL=$SWIFT_URL.sig
+ARG SWIFT_PREFIX=/opt/swift
+ARG SWIFT_SIGNING_KEY=52BB7E3DE28A71BE22EC05FFEF80A866B47A981F
+ARG TARGETARCH
 
 # Download swift & signature
-RUN export GNUPGHOME="$(mktemp -d)"
-RUN curl -fsSL "$SWIFT_URL" -o swift6.tar.gz "$SWIFT_SIG_URL" -o swift6.tar.gz.sig
-# Get signing keys for swift
-RUN gpg --quiet --keyserver hkp://keyserver.ubuntu.com --recv-keys "$SWIFT_SIGNING_KEY"
-# Verify signature
-RUN gpg --verify swift6.tar.gz.sig swift6.tar.gz
-# Unpack & add to path
-RUN tar -xzf swift6.tar.gz --directory / --strip-components=1
-RUN chmod -R o+r /usr/lib/swift
-# Remove archive
-RUN rm -rf "$GNUPGHOME" swift6.tar.gz.sig swift6.tar.gz
+RUN set -eu; \
+        case "$TARGETARCH" in \
+                amd64) SUFFIX="" ;; \
+                arm64) SUFFIX="-aarch64" ;; \
+                *) echo "Unsupported TARGETARCH"; exit 1;; \
+        esac; \
+        SWIFT_URL="https://download.swift.org/swift-6.0.1-release/ubuntu2404${SUFFIX}/swift-6.0.1-RELEASE/swift-6.0.1-RELEASE-ubuntu24.04${SUFFIX}.tar.gz"; \
+        export GNUPGHOME="$(mktemp -d)"; \
+        curl -fsSL "$SWIFT_URL" -o swift6.tar.gz "$SWIFT_URL.sig" -o swift6.tar.gz.sig; \
+        gpg --quiet --keyserver hkp://keyserver.ubuntu.com --recv-keys "$SWIFT_SIGNING_KEY"; \
+        gpg --verify swift6.tar.gz.sig swift6.tar.gz; \
+        mkdir -p "$SWIFT_PREFIX"; \
+        tar -xzf swift6.tar.gz --directory "$SWIFT_PREFIX" --strip-components=1; \
+        chmod -R o+r "$SWIFT_PREFIX/usr/lib/swift"; \
+        rm -rf "$GNUPGHOME" swift6.tar.gz.sig swift6.tar.gz
+
+ENV PATH="${PATH}:${SWIFT_PREFIX}/usr/bin"
