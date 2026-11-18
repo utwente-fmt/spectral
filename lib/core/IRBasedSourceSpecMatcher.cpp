@@ -214,16 +214,10 @@ namespace sourcespec2ir
                 }
 
                 const auto iLine = dbgLoc.getLine();
-                auto isDebugIntrinsic = llvm::isa<llvm::DbgVariableIntrinsic>(&*it);
                 if (iLine >= endLine && iLine < closestLine)
                 {
                     throw utils::PallasException(
                         "Encountered an instruction between contract and function.");
-                }
-                else if (iLine >= endLine && iLine == closestLine && !isDebugIntrinsic)
-                {
-                    throw utils::PallasException(
-                        "Encountered an instruction on the same line as the function.");
                 }
             }
         }
