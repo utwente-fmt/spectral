@@ -445,7 +445,7 @@ namespace sourcespec2ir
             {
                 std::stringstream s;
                 s << "Number of given-args does not match between call "
-                  << "and contract (" << gBindings->srcLoc.asShortString() << ")";
+                  << "and contract (" << gBindings->srcLoc.asShortString(false) << ")";
                 throw utils::PallasException(s.str());
             }
 
