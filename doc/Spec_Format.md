@@ -157,7 +157,7 @@ Other variables (e.g. global variables) are not accessible.
 
 Contracts for external or generated functions are specified using the following grammar:
 ```
-EXT_CONTR       ::= '/*@' 'assumed'? 'contract' 'for' 'external'
+EXT_CONTR       ::= '/*@' ('transitively'? 'assumed')? 'contract' 'for' 'external'
                            MAPPING_CLAUSE
                            SIG_CLAUSE?
                           'pure;'? 
@@ -166,7 +166,7 @@ EXT_CONTR       ::= '/*@' 'assumed'? 'contract' 'for' 'external'
                            CONTR_CLAUSE+
                       '@*/'
 
-GEN_CONTR       ::= '/*@' 'assumed'? 'contract' 'for' 'generated'
+GEN_CONTR       ::= '/*@' ('transitively'? 'assumed')? 'contract' 'for' 'generated'
                            MAPPING_CLAUSE
                           'pure;'? 
                            GIVEN_DEF*
@@ -195,6 +195,37 @@ Additionally, external and generated contracts contain the following elements:
 **Assumed-flag:**
 External and generated contracts can contain an `assumed`-flag. If this flag is set, it is assumed that the implementation of the function conforms to the provided contract without checking this. 
 This can be used when a function is used for which only a declaration but no definition is available.
+
+External and generated contracts can further be marked as `transitively assumed`.
+This means that the annotated function is treated like a function with a regular `assumed`-flag.
+In addition, the `transitively assumed`-flag indicates that all functions that are **only** called from (directly or indirectly) transitively assumed functions should be ignored during verification.
+
+Consider e.g. the following callgraph where function `A` is considered to be annotated as transitively assumed:
+```mermaid
+flowchart TD
+    classDef tAssumed stroke:#A662BD,stroke-width:3px
+    classDef ignored stroke:#A4A4A4,stroke-width:3px,stroke-dasharray:5 5
+    classDef default stroke-width:3px
+
+    A[A]
+    B[B]
+    C[C]
+    D[D]
+    E[E]
+    F[F]
+
+    A --> C
+    A --> D
+    B --> D
+    C --> E
+    C --> F
+
+    class A tAssumed
+    class C,E,F ignored
+```
+Here function `A` is marked as `transitively assumed`.
+Because function `C` is only called from transitively assumed functions, it should be ignored during verification. Similarly, functions `E` and `F` should be ignored because they are only called from function `C` which in turn gets ignored. 
+Function `D` is not affected by the `transitively assumed`-annotation of `A` because it is also called by function `B` which is not marked as `transitively assumed`.
 
 **Mapping clause:**
 External and generated contracts further contain a `MAPPING_CLAUSE` that determines to which functions the contract will be applied. 
